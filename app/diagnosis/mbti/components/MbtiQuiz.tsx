@@ -64,6 +64,9 @@ export function MbtiQuiz() {
       });
       const data = await res.json();
       if (data.success && data.result) {
+        if (data.result.id) {
+          localStorage.setItem("cocosil_mbti_result_id", data.result.id);
+        }
         setResult(data.result);
         setPhase("result");
       }
@@ -85,6 +88,9 @@ export function MbtiQuiz() {
       });
       const data = await res.json();
       if (data.success && data.result) {
+        if (data.result.id) {
+          localStorage.setItem("cocosil_mbti_result_id", data.result.id);
+        }
         setResult(data.result);
         setPhase("result");
       }

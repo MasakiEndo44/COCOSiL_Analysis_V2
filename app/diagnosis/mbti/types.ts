@@ -46,6 +46,8 @@ export interface MbtiPCI {
 
 /** 診断結果 */
 export interface MbtiResult {
+  /** DBのレコードID (UUID) */
+  id?: string;
   /** 4 文字のタイプコード (例: "INFJ") */
   mbtiType: string;
   /** 各軸合計スコア */
