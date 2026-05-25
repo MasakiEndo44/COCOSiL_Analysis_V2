@@ -121,14 +121,20 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 **業務フロー（正常系）**:
 
 1. MBTI診断完了（またはスキップ確定）を検知し、**バックグラウンドでLLM生成を開始**する（POST `/api/reports/generate`）
-2. Clerk JWT → `supabase.auth.getUser()` でユーザー特定。Zodスキーマで入力値（4体系データ・`user_id`）を全検証
-3. OpenAI API（30秒タイムアウト）に4体系データを送信し、レポートコンテンツを生成
+2. Clerk JWT → `supabase.auth.getUser()` でユーザー特定。Zodスキーマで入力値（4体系データ・`user_id`・`display_name`・`birthday`）を全検証
+3. **プロフィール取得**：`profiles.display_name`（D8・未設定時は「あなた」にフォールバック）と `profiles.birthday`（D9・4体系計算根拠の表示用）を取得
+4. **動物性格診断**：F2 API が返す **60type ID（1〜60）と `character` ラベル**（D10・`lib/data/animal-characters.ts` 由来）を入力に使用
+5. OpenAI API（30秒タイムアウト）に4体系データ＋ユーザーネームを送信し、レポートコンテンツを生成
    - 必須セクション：4体系横断統合考察（1セクション以上）、「大切な人との関係ヒント」（1セクション以上）
+   - プロンプト内で `display_name` を呼称トーン（えんまさ設計・Gate 2対象）に基づいて注入
+   - 動物性格診断は 60type の `character` ラベル（例：「気分屋の猿」）を優先使用、12type の `baseAnimal` は内部参照のみ
    - プロンプトはえんまさ設計（`lib/prompts/report/system-prompt.ts`）、Gate 2対象
-4. 生成済みコンテンツを `og-image.tsx`（Reactコンポーネント）に流し込み、`@vercel/og` で **1024×1792 PNG** を生成
-5. Supabase Storage `user-reports` バケットに `${user_id}/${uuid}.png` で保存（RLS policy: `user_id = auth.uid()`）
-6. レポートURL（Storage公開URL）をレスポンスとして返す
-7. F3.2「安心」フェーズのCTAタップ or 15秒経過後、レポート本体を表示
+6. 生成済みコンテンツを `og-image.tsx`（Reactコンポーネント）に流し込み、`@vercel/og` で **1024×1792 PNG** を生成
+   - OG描画時に `display_name` を埋め込み（20文字超は省略表示・D8）
+   - 生年月日はフッターレベルで控えめに描画（年齢は非表示・D9）
+7. Supabase Storage `user-reports` バケットに `${user_id}/${uuid}.png` で保存（RLS policy: `user_id = auth.uid()`）
+8. レポートURL（Storage公開URL）をレスポンスとして返す
+9. F3.2「安心」フェーズのCTAタップ or 15秒経過後、レポート本体を表示
 
 **例外系**:
 
@@ -139,6 +145,10 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 | Vercel OG 生成失敗 | Markdown+CSS 静的レポートにフォールバック。ユーザーに生成失敗を悟らせない（フォールバック表示とリッチ表示の体験差を最小化） |
 | Supabase Storage 保存失敗 | 表示は成功させ、保存リトライをバックグラウンドで行う。保存失敗ログを記録 |
 | 入力値バリデーション失敗（Zodエラー） | 400エラーと共に具体的なフィールドエラーをクライアントに返す（内部エラーは含まない） |
+| `display_name` がモデレーション違反（差別語・他人名・絵文字攻撃等） | `lib/constitution/` のモデレーションルールで遮断。フォールバック「あなた」に置換してレポート生成を継続。検知ログを記録（D8） |
+| `display_name` が20文字超 | レポート本文・OG描画ともに省略表示（例：先頭16文字 + 「…さん」）。エラーは出さない（D8）|
+| `profiles.birthday` が未設定 | 4体系の星座・六星算出が不能。F2診断未完了として扱い、F3.1.9の生年月日表示はスキップ（フッター非表示）|
+| 60type算出失敗（1930年未満等のサポート外生年月日） | フォールバックとして12type（`baseAnimal`）のみで生成。要件書 §10.3 のフォールバック設計に従う |
 
 **特殊要件**:
 
@@ -146,6 +156,10 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - `lib/constitution/banned-words.ts` による禁止語ユニットテストをCI必須化
 - **F3.1は初回生成のみ担当**。再生成（30日ゲート・課金ゲート・蓄積データ反映）は F3.5（TSK-API-009）で実装
 - gpt-image-2による背景・アイコン画像生成はPhase 3以降。文字レイヤーは全フェーズVercel OGが担保
+- **ユーザーネーム呼称トーン（D8）**：「○○さん」「○○」「呼び捨て」のいずれを採用するかはえんまさ確定（Gate 2対象）。トーン確定までは「○○さん」を仮採用
+- **モデレーションルール（D8）**：`lib/constitution/` 配下に `name-moderation.ts` を新設しConstitution化。CIで `display_name` バリデーションテストを実行
+- **OG文字数clamp（D8）**：Vercel OG描画コンポーネント内で20文字超を機械的に省略（ユニットテスト必須）
+- **60type化（D10）**：F3.1のプロンプトは 60type の `character` ラベルを参照する形に書き換え（Gate 2対象）。**TSK-DATA-XXX（60typeレポート用詳細説明文整備）の完了を前提とする**。未完了時は `character` ラベルのみのフォールバックプロンプトを使用
 
 ---
 
@@ -359,15 +373,19 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - **実装タイミング**: Phase 3以降。Phase 1〜2はVercel OGのみで完結
 - **想定コスト（仮定）**: 1画像あたり $0.04〜$0.08（中品質・1024×1024）。Phase 3で詳細見積もり（要確認）
 
-### 6.4 Supabase PostgreSQL（マーカー・アンケート記録）
+### 6.4 Supabase PostgreSQL（マーカー・アンケート・プロフィール）
 
-- **用途**: F3.3マーカーデータ・F3.4アンケート回答・F3.5月次再生成枠の管理
+- **用途**: F3.3マーカーデータ・F3.4アンケート回答・F3.5月次再生成枠・F3.1ユーザーネーム/生年月日プロフィールの管理
 - **連携方式**: Supabase JS SDK（`@supabase/supabase-js`）。サーバーサイドのみ（API Route Handler内）
 - **認証方式**: Clerk JWT → `supabase.auth.getUser()` でユーザー特定。クライアントからの直接書き込みはRLSで制限
 - **データ種別**:
   - `know_markers`（仮称）：`user_id`, `report_id`, `section_id`, `section_text`, `created_at`
   - `analytics_events`（既存）：アンケート回答レコード
   - `reports`（仮称）：`user_id`, `storage_url`, `generated_at`, `regen_count`, `last_regen_at`
+  - `profiles`（D8・D9で拡張）：`user_id`, `display_name TEXT NOT NULL DEFAULT 'あなた'`（D8）, `birthday DATE`（D9・F2で既収集）, `created_at`, `updated_at`
+    - RLS：`user_id = auth.uid()` を read/write 両方に適用
+    - F1要件書側で入力フォームを定義。F3はこのテーブルからの読み取りのみ
+    - `display_name` のモデレーションは API Route の Zodスキーマ + `lib/constitution/name-moderation.ts` で二重検証
 
 ### 6.5 Supabase Storage（レポート画像永続化）
 
@@ -406,19 +424,28 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 | APIルート | Next.js 16 App Router | `app/api/reports/generate`・`regenerate`・`og` |
 | バリデーション | Zod（`zod/v4`） | 全APIルート入力値の検証 |
 | フロントエンド | Next.js 16 + Tailwind CSS 4 + TypeScript 5 | F3.2アニメ・F3.3マーカーUI・F3.4アンケートUI |
+| 4体系データ（60アニマル）| `lib/data/animal-characters.ts`（基本データ・60type全件整備済み）+ `lib/data/destiny-number-database.ts`（1930-2030年運命数DB）+ TSK-DATA-XXX（レポート用詳細説明文・並行整備）| D10により 60type を採用。F2 API は 60type ID + `character` ラベルを返す |
+| プロフィール管理（D8）| Supabase `profiles.display_name` + `lib/constitution/name-moderation.ts`（新設）| 自由入力ユーザーネームの永続化とモデレーション。F1要件書で入力フォーム定義 |
 
 ### 7.2 データフロー
 
 ```
-[F2診断完了] → POST /api/reports/generate
+[F2診断完了（60type算出済み）] → POST /api/reports/generate
                   ↓
              Zod バリデーション
+             （+ display_name モデレーション・D8）
                   ↓
          Clerk JWT → supabase.auth.getUser()
                   ↓
+         Supabase profiles SELECT
+         （display_name・birthday 取得）
+                  ↓
              OpenAI API（30秒タイムアウト）
+             プロンプト入力：4体系（60type character 含む）+ display_name
                   ↓ 成功                ↓ 失敗（30秒超・5xx）
          Vercel OG (og-image.tsx)    Markdown+CSS フォールバック
+         display_name 描画（20文字clamp）
+         birthday 控えめ描画（年齢非表示）
                   ↓
          Supabase Storage user-reports/${user_id}/${uuid}.png
                   ↓
@@ -452,6 +479,13 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - TSK-PROMPT-001：F3レポートプロンプト・F3.2サブテキスト設計（えんまさ）
 - TSK-API-002：F3.1レポート生成API（POST `/api/reports/generate`）（ヒラメ）
 - TSK-UI-003：F3.2安心フェーズUI・F3.1レポート表示・F3.3マーカーUI・F3.4アンケートUI（まあみ）
+- **TSK-DATA-XXX：60typeレポート用詳細説明文の整備（並行・D10）**（えんまさ＋まあみ）
+  - `lib/data/animal-characters.ts` の `character` ラベルを土台に、各60typeのレポート品質に耐える説明文（性格傾向・関係性ヒント等）を整備
+  - 並行整備が間に合わない場合は `character` ラベルのみのフォールバックプロンプトでPhase 1を進める
+- **F1.X：ユーザーネーム入力フィールド追加（D8）**（まあみ・F1要件書との整合）
+  - 自由入力UI・モデレーション拒否時のUX・呼称トーン確定
+- **`lib/constitution/name-moderation.ts` 新設（D8）**（ヒラメ＋えんまさ）
+  - 差別語・他人名・絵文字攻撃の検出ルールをConstitution化。CIで `display_name` バリデーションテストを実行
 
 **期間目安（仮定）**: 3〜4週間（Sprint 1〜2相当）
 
@@ -522,6 +556,18 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - **Supabase Storage 0.5GB超過**：PNG保存不可
   - *対策*: 90日以上アクセスされていない旧レポートPNGをアーカイブまたは削除するバッチをPhase 1から実装。ストレージ使用量をF9.3ダッシュボードでモニタリング
 
+- **ユーザーネーム自由入力の不適切値混入（D8）**：「ばかさんの性格分析」等のシュールな出力・差別語の他害
+  - *対策*: `lib/constitution/name-moderation.ts`（新設）で入力時・OG描画前の二重チェック。検知時はフォールバック「あなた」に置換しレポート生成は継続。検知ログを記録し、Constitution改善のためにえんまさが定期レビュー
+
+- **ユーザーネームOG描画のレイアウト崩壊（D8）**：20文字超のネームでVercel OG縦長レイアウト破綻
+  - *対策*: OG描画コンポーネント内で文字数clamp（20文字超は省略表示）。ユニットテストで動作保証
+
+- **60アニマル詳細説明文の整備遅延（D10）**：F3.1プロンプトが空・低品質な出力
+  - *対策*: TSK-DATA-XXX を Phase 1着手前完了を目標とする。間に合わない場合は `character` ラベルのみ参照のフォールバックプロンプトで Phase 1 を進め、Phase 2 で詳細説明文を反映したプロンプトに置換
+
+- **F2 の60type算出ロジックがサポート外生年月日に対応できない（D10）**：1930年未満等のユーザーで60type算出失敗
+  - *対策*: F2側で12type（`baseAnimal`）のみの算出にフォールバック。F3.1プロンプトも12typeのみで生成可能なルートを用意
+
 ---
 
 ## 10. ランニング費用と運用方針
@@ -556,6 +602,7 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 | 日付 | バージョン | 概要 | 承認者 |
 |---|---|---|---|
 | 2026-05-24 | v1.0 | 初版作成。F3_integrated-report_features.md（2026-05-21）のrequirements-grillセッション成果物を詳細要件定義書（Stage 2）として統合。spec-sync未実施項目（D3:蓄積データ反映型のF3.5記述）を本書で反映 | えんまさ |
+| 2026-05-25 | v1.1 | PR#60レビュー議論（議論ログ_PR60-F3要件レビュー.md）の Turn 6 を反映：D8（ユーザーネーム自由入力 → F3表示）、D9（生年月日表示・年齢非表示）、D10（60type化）の3決定を要件書に追加。F3.1.8〜10要件、`profiles` テーブル拡張、TSK-DATA-XXX並行整備、`lib/constitution/name-moderation.ts` 新設を追記。**未反映項目（議論Turn 5発の🔴4項目）は別議論で対応** | えんまさ |
 
 ---
 
@@ -569,6 +616,9 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - `docs/sandbox/endo/grill-sessions/2026-05-21_cocosil-F-f3-integrated-report.md` — F3 grillセッション記録（5サブフィーチャー全8問・40問完了）
 - `docs/discussions/議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則の確定議論
 - `docs/discussions/議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
+- `docs/discussions/議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（D8・D9・D10）の確定議論
+- `lib/data/animal-characters.ts` — 60アニマル基本データ（ID 1〜60・`baseAnimal`/`character`/`color`）
+- `lib/data/destiny-number-database.ts` — 1930-2030年運命数DB（60type算出ロジックの土台）
 
 **全体要件定義書（上位ドキュメント）**:
 - `docs/output/requirements/cocosil_v2_system_requirements.md` — COCOSiL V2 システム要件定義書（F3.1〜F3.5の表を含む）

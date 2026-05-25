@@ -24,6 +24,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 - `docs/output/requirements/cocosil_v2_system_requirements.md` — Stage 1要件（F3.1〜F3.5）
 - `docs/discussions/議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則
 - `docs/discussions/議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
+- `docs/discussions/議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（ユーザーネーム / 生年月日 / 60type化）の確定議論
+- `lib/data/animal-characters.ts` — 60アニマル基本データ（ID 1〜60・`baseAnimal`/`character`/`color` 整備済み）
+- `lib/data/destiny-number-database.ts` — 1930-2030年 運命数DB（60type算出ロジックの土台）
 - `AGENTS.md §0, §7` — 設計中枢・Protected Areas
 
 ### 置いた仮定
@@ -33,6 +36,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 - **F3.2のアニメーション実装**: CSS アニメーション（呼吸アニメ）で完結（根拠：gpt-image-2演出はPhase 3分離の設計判断）
 - **満足度スコア集計先**: `analytics_events` テーブル（根拠：既存詳細要件書§4.3）
 - **F3.5の課金判定**: F7（Stripe）との連携により `subscription_status` を確認（根拠：D4設計判断）
+- **ユーザーネーム入力フィールド**: F1（オンボーディング）で自由入力として収集（根拠：D8確定。F1要件書での詳細化を待つ）
+- **生年月日の取得元**: F2（4体系診断）で既収集（星座・六星占術の計算入力。`profiles.birthday` 等の既存カラムを想定 / 要確認）
+- **60アニマル基本データ**: `lib/data/animal-characters.ts` の `ANIMAL_60_CHARACTERS` を採用（ID 1〜60完備）。レポート用詳細説明文は TSK-DATA-XXX で別途整備（根拠：D10）
 
 ---
 
@@ -47,6 +53,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | D5 | F3.2のスキップ可否 | **スキップ不可**。原則②（三毒増幅禁止）の実装。設計三原則「Zero-Effort Reassurance / Active→Receptive Handoff / De-judging through Metaphor」確定 | F3.2 |
 | D6 | F3.3のマーカー粒度 | セクション単位。テキスト行単位は超低摩擦原則を損なう。F3.1のセクション構造に依存 | F3.3 |
 | D7 | F3.4のアンケート強制有無 | 任意（スキップ可）。スキップしても後続機能（F4チャット等）に進める。ゲート化は原則②と矛盾 | F3.4 |
+| D8 | F3レポートのユーザーネーム表示 | F1で自由入力したユーザーネームをF3レポート内・OG画像内で表示し「私のレポート感」を高める。`profiles.display_name TEXT NOT NULL DEFAULT 'あなた'`。モデレーション（差別語・他人名等）はConstitution化。OG描画は20文字超でclamp。**呼称トーン（「○○さん」 vs 呼び捨て）はえんまさ確定（Gate 2対象）** | F3.1 / F1要件書 |
+| D9 | F3レポートの生年月日・年齢の表示 | **年齢は表示しない**（設計中枢 Q2「三毒増幅禁止」回避：「30歳のあなたへ」表記が焦り・嫉妬・自己否定を誘発するリスク）。生年月日は4体系（星座・六星）計算根拠としてフッターレベルの控えめ表示。シェアカード（F6）には出さない | F3.1 / F6 |
+| D10 | 動物性格診断の type 数 | **60type を採用**（12type ではなく）。基本データ `lib/data/animal-characters.ts`（ID 1〜60・`baseAnimal`/`character`/`color` 整備済み）、算出土台 `lib/data/destiny-number-database.ts`（1930-2030年運命数DB）を使用。**レポート用詳細説明文の整備は TSK-DATA-XXX 並行タスクで完了させる前提**。F2 API は 60type ID + character ラベルを返す | F2 / F3.1 / lib/data |
 
 ---
 
@@ -63,6 +72,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | F3.1.5 | Supabase Storageへの永続化 | 必須 | 生成PNGを `user-reports` バケットに `${user_id}/${uuid}.png` で保存。RLS policy（`user_id = auth.uid()`）を必ず適用 |
 | F3.1.6 | Markdown+CSSフォールバック | 必須 | Vercel OG生成失敗時は静的Markdown+CSS形式でレポートを表示。ユーザーに生成失敗を悟らせない設計 |
 | F3.1.7 | 全セクション閲覧・F3.4/次アクション導線到達 | 必須 | レポートの全セクションがスクロールで閲覧可能。末尾にF3.4アンケートと次アクション（F4チャット）導線を配置 |
+| F3.1.8 | ユーザーネーム表示（D8） | 必須 | F1で入力された `profiles.display_name` をレポート本文の冒頭または見出しで表示。OG画像内にも描画（20文字超は省略表示）。未入力時は「あなた」にフォールバック。呼称トーン（「○○さん」 vs 呼び捨て）はえんまさ設計（Gate 2対象）。AIプロンプトに `display_name` を注入する形で実現（4体系統合考察セクションでも「○○さんは〜」のトーン使用可）|
+| F3.1.9 | 生年月日表示・年齢非表示（D9） | 必須 | レポート末尾フッター等の控えめな位置に生年月日を表示（4体系計算根拠としての透明性確保）。**年齢は表示しない**（設計中枢 Q2回避）。F2で既収集の生年月日を参照。シェアカード（F6）には出さない |
+| F3.1.10 | 60アニマル参照（D10） | 必須 | F2 API が返す 60type ID および `character` ラベル（`lib/data/animal-characters.ts` 由来）をレポート内・プロンプト・OG描画で使用する。12type（`baseAnimal`）は内部参照のみ、ユーザー向け文言は 60type の `character` ラベル（例：「気分屋の猿」「リーダーとなるゾウ」）を優先表示。**TSK-DATA-XXX（60typeレポート用詳細説明文整備）の完了を前提とする** |
 
 ### F3.2: 「安心」フェーズ
 
@@ -130,6 +142,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | ユーザビリティ | UXシーケンス順守 | 共感→安心→分析→行動の順序を破らない | `lib/constitution/ux-sequence.ts` が正。F3.2スキップ不可の根拠 |
 | スケーラビリティ | Supabase Storage使用量 | 0.5GB上限（無料枠）以内で運用 | テキストデータ中心・積極的アーカイブ戦略で管理（AGENTS.md §4） |
 | 対応環境 | ターゲットデバイス | スマートフォン（iOS/Android）ブラウザ優先 | ペルソナAの主要デバイス。Thumb Zone内CTA設計の根拠 |
+| セキュリティ | ユーザーネーム自由入力のモデレーション（D8） | 差別語・他人名・絵文字攻撃の検出・拒否ルールを `lib/constitution/` 配下に追加 | 自由入力ゆえのブランド毀損・他害リスクの遮断。Constitution化により実装層と分離 |
+| ユーザビリティ | OG画像内ユーザーネームの文字数制限（D8） | 20文字超は省略表示（例：「みさき子のチームリーダーで…さん」→ 16文字程度でclamp） | Vercel OG の縦長レイアウト崩壊防止 |
+| プライバシー | 生年月日のシェアカード非表示（D9） | F6シェアカード生成時に生年月日フィールドを必ず除外 | 個人特定情報のSNS露出防止。F6側でも要件化 |
 
 ---
 
@@ -142,6 +157,8 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | コンテンツ生成AI | OpenAI（GPT-4o系）| 4体系統合の複雑な推論に必要な高品質なLLM。COCOSiLの既存技術選定に一致 |
 | データ永続化（レポート画像） | Supabase Storage | ユーザーごとのPNG保存。RLSによるアクセス制御。無料枠0.5GBの制約内で積極的アーカイブ戦略 |
 | データ永続化（マーカー・アンケート） | Supabase PostgreSQL | F4.3/F5.3への参照が必要なリレーショナルデータ。RLSポリシーで `user_id = auth.uid()` を適用 |
+| データ永続化（プロフィール拡張） | Supabase PostgreSQL `profiles.display_name` | ユーザーネーム自由入力（D8）の永続化。`TEXT NOT NULL DEFAULT 'あなた'` |
+| 4体系データ（60アニマル） | `lib/data/animal-characters.ts`（既存）+ TSK-DATA-XXX（追加） | 60type基本データ整備済み（ID 1〜60・`baseAnimal`/`character`/`color`）。レポート用詳細説明文は別タスクで並行整備 |
 | 認証 | Clerk + Supabase JWT連携 | `supabase.auth.getUser()` でClerk JWTを検証。AGENTS.md §7 Gate 1要件 |
 | APIルート | Next.js 16 App Router API Route Handler（`app/api/`） | Server Actions不使用（AGENTS.md §1厳格ルール）。全ビジネスロジックはAPI Route Handler |
 | 入力バリデーション | Zod（`zod/v4`）| APIルート入力値の全検証。AGENTS.md §7 Gate 1要件 |
@@ -161,6 +178,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 - F3.3: 「しっくりきた」マーカーUIおよびDB記録実装（F3.1完成後）
 - F3.4: 満足度アンケートUI実装（F3.1末尾に同梱）
 - F3.4: KPIダッシュボード（F9.3）への集計接続
+- F3.1.8〜10: ユーザーネーム表示（D8）/ 生年月日表示・年齢非表示（D9）/ 60アニマル参照（D10）の実装
+- TSK-DATA-XXX: 60typeレポート用詳細説明文の整備（並行タスク・Phase 1着手前完了が望ましい）
+- ユーザーネームモデレーションルールの `lib/constitution/` 配下への追加（Gate 2対象）
 
 ### Phase 2: F3 継続性検証（F3.3利用率）
 **目的**: F3.3マーカーの利用率10%以上を検証し、未達の場合は3スプリント以内に再設計する。F4.3/F5.3との連携を確認する。
@@ -214,6 +234,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | F3.2「安心」フェーズが摩擦化（特に再訪時） | ユーザー離脱増加 | 再訪時はアニメ短縮＋テキスト変更で摩擦低減（F3.2.8）。スキップ不可の原則は維持 |
 | AIサブテキストが禁止語を含む・三毒増幅 | ブランド毀損・設計中枢違反 | `lib/constitution/banned-words.ts` によるユニットテスト（`expect(prompt).not.toContain("占い")` 等）をCI必須化。えんまさGate 2承認 |
 | UXシーケンス順序破壊（F3.2スキップ実装） | 止観構造の崩壊、PMF未達直結 | `lib/constitution/ux-sequence.ts` でシーケンス定義。F3.2はスキップ不可をコードレベルで保証 |
+| ユーザーネーム自由入力の不適切値混入（D8） | 「ばかさんの性格分析」等のシュールな出力・差別語の他害 | `lib/constitution/` のモデレーションルールで遮断。OG描画前に再度チェック。検知時はフォールバック「あなた」に置換 |
+| ユーザーネームのOG描画レイアウト崩壊（D8） | 20文字超のネームでVercel OG縦長レイアウト破綻 | OG描画レイヤーで文字数clamp（20文字超は省略表示）。ユニットテストでclamp動作を保証 |
+| 60アニマル詳細説明文の整備遅延（D10） | F3.1プロンプトが空・低品質な出力 | TSK-DATA-XXX を Phase 1着手前に完了させる。間に合わない場合は character ラベルのみ参照のフォールバックプロンプトを準備 |
 
 ---
 
