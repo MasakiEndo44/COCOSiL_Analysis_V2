@@ -27,6 +27,10 @@ const serverEnvSchema = z.object({
   // PostHog（Phase A テレメトリ — 未設定時はイベント送信をスキップ）
   POSTHOG_API_KEY: z.string().min(1).optional(),
   POSTHOG_HOST: z.url().optional(),
+  // OpenAI（F3 統合レポート生成・F4 共感チャット）
+  OPENAI_API_KEY: z.string().min(1).optional(),
+  // Supabase サービスロールキー（F3 Storage サーバーサイドアップロード用）
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
 });
 
 export function getServerEnv() {
