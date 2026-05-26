@@ -135,6 +135,7 @@ COCOSiLは「現代の無明（むみょう）」を解消するために存在�
 - `lib/prompts/**` — AIプロンプトテンプレート（チャット3フェーズ・統合レポート・シェアカード）
 - `lib/data/**` — 4体系ナレッジ（MBTI / 星座 / 動物性格診断 / 六星占術）
 - `lib/diagnostics/**` — 診断計算ロジック（実装はヒラメ、内容承認はえんまさ）
+  - F3.1 4体系統合アルゴリズム設計（Tree of 4, Harvest 1.）: [docs/output/goals/f3-keyword-tree-integration.md](docs/output/goals/f3-keyword-tree-integration.md)
 
 ### Layer 3：開発層（AI委任OK）
 
