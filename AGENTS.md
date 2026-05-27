@@ -272,6 +272,8 @@ Autogenesis Constitution（絶対不変リスト・Mutableリスト）と言語�
 | UXシーケンス順序 | `lib/constitution/ux-sequence.ts` |
 | Policy / 評価指標定義（不変） | `lib/constitution/immutables.ts` |
 | Mutable Path / Strategy（進化対象） | `lib/constitution/mutables.ts` |
+| F3.1 観察軸5軸 + メタ層（識） | `lib/constitution/observation-axes.ts` |
+| F3.1 観察軸ツリーデータ Schema | `lib/constitution/observation-tree-schema.ts` |
 
 ドリフトは `lib/constitution/__tests__/drift.test.ts`（CIで実行）が文書とコードを照合して検知する。
 
