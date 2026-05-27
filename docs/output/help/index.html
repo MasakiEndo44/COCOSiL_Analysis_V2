@@ -430,48 +430,143 @@ const result = await streamText({
           <li><strong>Minimal Signature, Rich Expression.</strong>　軸のキーワードは識別シグネチャ（3-5語）に限定、表現語彙の豊かさは Deep Research が担う</li>
           <li><strong>Priority Resolves Crossings.</strong>　軸間の越境概念は <code>layer_priority</code> で主軸を1つ指定して解決</li>
         </ol>
+
+        <div class="callout callout-warning" style="margin-top: 1rem">
+          <strong>📍 設計改修中（PR #66）</strong>: <code>relational_mode</code> は Phase D で <strong>他4軸（embodied/emotional/cognitive/motivation）の相互作用結果として顕現するメタ層</strong>に格上げ予定。識（vijñāna）が他4蘊のメタ層であるのと同型構造（4軸 + 1メタ層）。詳細は §2.4 参照。
+        </div>
       </section>
 
       <section>
-        <h2>2.4 統合アルゴリズム — Tree of 4, Harvest 1.</h2>
-        <p>
-          F3.1 観察軸ツリー構築は、観察軸5軸を root に据え、その上に4体系の枝を接続し、
-          「太さ = 接続体系数」で収束を検出する。LLM はツリー外の創作を禁止する（Harvest, Don't Hallucinate）。
+        <h2>2.4 ワードツリー統合アルゴリズム — Profiles over Cells.</h2>
+        <p class="lead">
+          F3.1 ワードツリー統合は、<strong>「4体系 × 5軸 = 20 セル格子」設計（旧 Tree of 4, Harvest 1.）から「幹と枝」モデル（Profiles over Cells）への移行中</strong>。
+          各カテゴリは5軸に分散した特徴ベクトル（プロファイル）を持ち、EMD + 階層クラスタリングで決定論的に統合する。
+          LLM はナラティブ生成のみを担い、計算ロジックから分離される。
         </p>
 
-        <div class="callout callout-info">
-          <strong>設計3原則（議論で確定）</strong>
-          <ol>
-            <li><strong>Common Axis, Not Common Word</strong> — 観察軸を先に固定し、その上に4体系を載せる</li>
-            <li><strong>Thickness = Convergence, Not Repetition</strong> — 「太い幹」は語の重複ではなく軸の収束</li>
-            <li><strong>Harvest, Don't Hallucinate</strong> — LLM はツリー外の創作禁止</li>
-          </ol>
-          <small>— docs/output/goals/f3-keyword-tree-integration.md</small>
+        <div class="callout callout-warning">
+          <strong>📍 設計改修中（PR #66）</strong>:
+          えんまさ実施の Deep Research (2026-05-28) で旧設計の<strong>「Procrustean Mapping 問題」</strong>が学術的に裏付けられ、現行 20 セル格子から「幹と枝」モデルへの移行計画を策定。Hartmann et al. (2006) の実証研究（N=4,000+ / 11,000+）で「出生月・星座と Big Five・一般知能の統計相関ゼロ」が示されている事実とも整合する。詳細は <a href="../decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md">F3.1 ワードツリー構築 改修計画</a>。
         </div>
 
-        <h3>3層分類（整合 / 補完 / 矛盾）</h3>
+        <h3>新設計3原則（Profiles, Geometry, Anatta）</h3>
+        <ol>
+          <li><strong>Profiles over Cells.</strong>　セルではなくプロファイル。各カテゴリは5軸に分散した特徴ベクトルを持つ。例: 水瓶座 = <code>cognitive 0.9 / motivation 0.85 / relational 0.80 / embodied 0.25</code>。「1体系 = 1軸」セル設計の中核削ぎ落とし問題を構造的に解消。</li>
+          <li><strong>Geometric Fusion, LLM Narration.</strong>　幾何で統合、LLM で語る。EMD + 階層クラスタリングは決定論的 TS 関数。LLM はナラティブ層のみ。期待効果: LLM トークン消費 <strong>-55%</strong> / TTFT <strong>15s → 5s 未満</strong>。</li>
+          <li><strong>Anatta-Aware Output.</strong>　無我を意識した出力。「あなたはこういう人です」と固定的に断定する表現を全プロンプトから排除し、「〇〇な傾向が今強め」のような状況依存的・確率的表現に。設計中枢「無明を晴らす」哲学への忠実度向上。</li>
+        </ol>
+
+        <div class="diagram" role="img" aria-label="幹と枝モデル：複数体系の中核は太い幹に、特定体系固有特性は枝に">
+          <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+            <rect x="280" y="16" width="160" height="44" rx="6" fill="#5b21b6" stroke="#4c1d95" stroke-width="1.5"/>
+            <text x="360" y="36" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">統合人格（Root）</text>
+            <text x="360" y="52" font-family="-apple-system, sans-serif" font-size="10" fill="#ede9fe" text-anchor="middle">4体系 統合プロファイル</text>
+
+            <line x1="360" y1="60" x2="360" y2="148" stroke="#5b21b6" stroke-width="14"/>
+            <text x="385" y="110" font-family="-apple-system, sans-serif" font-size="12" fill="#5b21b6" font-weight="600">太い幹 = 4体系合意</text>
+
+            <line x1="360" y1="150" x2="200" y2="220" stroke="#5b21b6" stroke-width="6"/>
+            <line x1="360" y1="150" x2="520" y2="220" stroke="#5b21b6" stroke-width="6"/>
+            <line x1="360" y1="150" x2="290" y2="234" stroke="#7c3aed" stroke-width="4"/>
+            <line x1="360" y1="150" x2="430" y2="234" stroke="#7c3aed" stroke-width="4"/>
+
+            <text x="248" y="200" font-family="-apple-system, sans-serif" font-size="11" fill="#7c3aed" font-weight="600">中位幹 = 2-3体系合意</text>
+
+            <line x1="200" y1="220" x2="110" y2="290" stroke="#a78bfa" stroke-width="2"/>
+            <line x1="290" y1="234" x2="245" y2="290" stroke="#a78bfa" stroke-width="2"/>
+            <line x1="430" y1="234" x2="475" y2="290" stroke="#a78bfa" stroke-width="2"/>
+            <line x1="520" y1="220" x2="610" y2="290" stroke="#a78bfa" stroke-width="2"/>
+
+            <rect x="60" y="290" width="100" height="40" rx="4" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+            <text x="110" y="308" font-family="-apple-system, sans-serif" font-size="11" fill="#4c1d95" text-anchor="middle">枝: 星座固有</text>
+            <text x="110" y="322" font-family="-apple-system, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">(末梢循環)</text>
+
+            <rect x="195" y="290" width="100" height="40" rx="4" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+            <text x="245" y="308" font-family="-apple-system, sans-serif" font-size="11" fill="#4c1d95" text-anchor="middle">枝: MBTI固有</text>
+            <text x="245" y="322" font-family="-apple-system, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">(認知機能型)</text>
+
+            <rect x="425" y="290" width="100" height="40" rx="4" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+            <text x="475" y="308" font-family="-apple-system, sans-serif" font-size="11" fill="#4c1d95" text-anchor="middle">枝: 動物固有</text>
+            <text x="475" y="322" font-family="-apple-system, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">(社会的役割)</text>
+
+            <rect x="560" y="290" width="100" height="40" rx="4" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+            <text x="610" y="308" font-family="-apple-system, sans-serif" font-size="11" fill="#4c1d95" text-anchor="middle">枝: 六星固有</text>
+            <text x="610" y="322" font-family="-apple-system, sans-serif" font-size="9" fill="#6d28d9" text-anchor="middle">(数理盤理論)</text>
+
+            <text x="50" y="270" font-family="-apple-system, sans-serif" font-size="10" fill="#a78bfa">細い枝 = 1体系固有（辺縁特性）</text>
+          </svg>
+          <p class="diagram-caption">図2-2: 「幹と枝」モデル — 複数体系で合意される中核は太い幹に、特定体系固有の彩りは枝に</p>
+        </div>
+
+        <h3>計算パイプライン — 決定論層 + LLM 層の分離</h3>
+        <ol>
+          <li><strong>Gate 1: カテゴリ抽出</strong>（LLM）— ユーザー入力から各体系のカテゴリ（INTP / Aquarius / Cheetah / 土星人 等）を特定</li>
+          <li><strong>Gate 2: 五蘊多次元ベクトル化</strong>（決定論 / 静的データ）— 各カテゴリの5軸 strength + features を <code>lib/data/categories/*.json</code> から取得。LLM 出力ではなく人間が確定したデータ</li>
+          <li><strong>Gate 3: 距離計算 + 階層クラスタリング</strong>（決定論 / TS）— EMD ベース距離行列 + 凝集型クラスタリング（AGNES + Ward 法）で Dendrogram 構築。threshold θ で「幹（中核合意）」と「枝（固有特性）」を分離</li>
+          <li><strong>Gate 4: 階層的ナラティブ生成</strong>（LLM）— 構造化された「幹 / 枝」を入力として、無我を意識した動的表現でレポート生成（温度 0.3-0.5）</li>
+        </ol>
+
+        <h3>3層分類（整合 / 補完 / 矛盾）— 新モデルでの再解釈</h3>
         <p>
-          ツリーから収穫された結果は、レポート上で <strong>「整合」「補完」「矛盾」</strong> の3セクションに展開される。
-          これが F3.1 受け入れ基準 AC-1「4ラベル羅列だけは不合格／統合考察1セクション以上」の機械判定版。
+          旧設計の3層分類「整合 / 補完 / 矛盾」は新設計でも継続。「幹と枝」モデルでは以下のように再解釈される:
+        </p>
+        <ul>
+          <li><strong>整合</strong> = 太い幹（4体系合意の中核特性）</li>
+          <li><strong>補完</strong> = 中位幹（2-3体系で合意される特性）</li>
+          <li><strong>矛盾</strong> = 枝同士の競合（異なる体系が反対方向の特性を主張する場合）</li>
+        </ul>
+        <p>
+          F3.1 受け入れ基準 AC-1「4ラベル羅列だけは不合格／統合考察1セクション以上」は <strong>Gate 3 の決定論的計算で構造保証</strong>される（LLM のプロンプト遵守に頼らない）。
         </p>
 
         <div class="accordion">
           <button class="accordion-header" type="button" aria-expanded="false">
-            <span>Eval 基準 — Positive Test と Negative Test</span>
+            <span>旧設計（Tree of 4, Harvest 1.）と Procrustean Mapping 問題</span>
             <span class="chevron" aria-hidden="true"></span>
           </button>
           <div class="accordion-body">
-            <p><strong>🟢 Positive Test（引用は最低限、表現力は残す）</strong></p>
+            <p>初期設計（PR #61 / #62）では <strong>「4体系 × 5軸 = 20 セル」格子</strong>で各セルに特徴語を格納する方針だった（Tree of 4, Harvest 1.）。観察軸5軸を root に据え、その上に4体系の枝を接続し、「太さ = 接続体系数」で収束を検出する設計。</p>
+            <p>しかし PR #62 初回実走（zodiac × embodied_pattern, Haiku 4.5）で <strong>aries の vector が positive → negative に転倒</strong>する現象が観測され、調査の結果 <strong>Procrustean Mapping 問題</strong>（プロクルステース的強制マッピング）が診断された:</p>
             <ul>
-              <li>各セクション（整合・補完・矛盾）で <code>harvest.representative_keywords</code> から <strong>最低3語以上</strong> 引用</li>
-              <li>全体での引用率は 40〜60% を目安（厳格な閾値ではなく観察用）</li>
+              <li>各体系のカテゴリは本来複数軸に分散した特徴量を持つ（例: 水瓶座の中核は cognitive / motivation / relational にあり、embodied は副次的）</li>
+              <li>「1体系 = 1軸」セル設計は各カテゴリの中核を1軸に強制押込 → 副次的側面しか拾えない</li>
+              <li>プロンプト改善では絶対に解消不可能 → 構造的データ設計の見直しが必要</li>
             </ul>
-            <p><strong>🔴 Negative Test（ハルシネーションは厳しく）</strong></p>
+            <p>えんまさ実施の Deep Research (2026-05-28) でも、Hartmann et al. (2006) の大規模実証研究（N=4,000+ / 11,000+）が「出生月・星座と Big Five・一般知能の統計相関はゼロ」を示しており、現状設計の限界が学術的に裏付けられた。</p>
+            <p>旧設計の用語（Tree of 4, Harvest 1. / harvest.representative_keywords 等）は段階的に廃止予定。</p>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">
+            <span>relational_mode のメタ層格上げ（4軸 + 1メタ層）</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>ハーバード成人発達研究</strong>の「人生の質・健康・幸福度を決定付ける唯一の要因は周囲の人間関係の温かさ」という80年以上の追跡結論を踏まえ、<code>relational_mode</code> は <strong>他4軸（embodied / emotional / cognitive / motivation）の相互作用結果として顕現するメタ層</strong>に格上げ予定（Phase D で実装）。</p>
+            <p>これにより、識（vijñāna）が他4蘊のメタ層であるのと同じ構造で、<code>relational_mode</code> が他4軸のメタ層となる。設計中枢のパンチャ構造解釈もより精緻化される。</p>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">
+            <span>Eval 基準 — 双方向バイアス対策 + 断定構文ガード</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="accordion-body">
+            <p><strong>🟢 Positive Test（引用率 + 多様性）</strong></p>
             <ul>
-              <li>ツリーに存在しない体系特徴語の混入率 <strong>≤5%</strong></li>
-              <li>「占星術ステレオタイプの権威化」「ツリー外捏造」を機械的に検出</li>
+              <li>「幹」「枝」両方からの特徴語引用が <strong>最低3語以上</strong> 各セクションに含まれる</li>
+              <li>全体での引用率は 40〜60% を目安</li>
+              <li>vector / confidence の3値全出現と σ ≥ 0.10 を Gate 3 で機械保証</li>
             </ul>
-            <p>検証ツール: <code>promptfoo</code> + えんまさ作成のホワイトリスト</p>
+            <p><strong>🔴 Negative Test（ハルシネーション + バーナム効果対策）</strong></p>
+            <ul>
+              <li>カテゴリプロファイルに存在しない体系特徴語の混入率 <strong>≤5%</strong></li>
+              <li>「あなたはこういう人です」型の固定断定構文を <code>lib/constitution/banned-output-patterns.ts</code>（Phase D で新設）で機械検出 → 検出率 100%</li>
+              <li>双方向バイアス対策: negative 見落とし（過小評価）と positive 過小評価（脆弱性記述に引きずられた negative 過判定）を Critique LLM で同等に疑う</li>
+            </ul>
+            <p>検証ツール: <code>promptfoo</code> + ヒラメ・えんまさ・みさきさんによる「近い/遠い」直感投票 10 ペア（Phase E で threshold θ 較正）</p>
           </div>
         </div>
 
@@ -482,11 +577,37 @@ const result = await streamText({
           </button>
           <div class="accordion-body">
             <p><strong>🔴 B-1: 並列羅列への退化（最優先・タスクの存在意義の否定）</strong></p>
-            <p>「あなたは蟹座で〜、ENFPで〜、ペガサスで〜」と各体系を順番に説明するレポートが出る状態。構造判定テスト失格。</p>
+            <p>「あなたは蟹座で〜、ENFPで〜、ペガサスで〜」と各体系を順番に説明するレポートが出る状態。「幹と枝」の階層構造が崩壊。</p>
             <p><strong>🔴 B-2: ハルシネーション（ステレオタイプ汚染）</strong></p>
-            <p>harvest 外の俗説特徴語が混入（「蟹座は家庭的だから尽くす女性」「ENFP は飽きっぽい」等）。Negative Test で混入率 &gt;5%。</p>
-            <p><strong>🔴 B-3: 同一入力で異なる harvest（再現性破綻）</strong></p>
-            <p>同じ4体系入力に対して、harvest の3層分類結果が実行ごとに異なる。Vitest unit test で検出。</p>
+            <p>カテゴリプロファイル外の俗説特徴語が混入。Negative Test で混入率 &gt;5%。</p>
+            <p><strong>🔴 B-3: 固定断定構文の混入（無我抵触）</strong></p>
+            <p>「あなたは〇〇な人です」「〇〇タイプです」と固定的に断定する表現が出力に混入。<code>banned-output-patterns.ts</code> で検出されたら自動 reject。</p>
+            <p><strong>🔴 B-4: バーナム効果（中和化された平坦な記述）</strong></p>
+            <p>階層クラスタリングの distance threshold が緩すぎて、全カテゴリで似たような「太い幹」が抽出され、誰にでも当てはまる薄い中核ばかりが残る状態。Phase E のゴールデンサンプル較正で防止。</p>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">
+            <span>5フェーズ実装計画と PR #62 の扱い</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="accordion-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Phase</th><th>期間</th><th>内容</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>A</td><td>5日</td><td>データ層再構築（<code>lib/data/categories/</code> 新設・100カテゴリ JSON）</td></tr>
+                  <tr><td>B</td><td>5日</td><td>計算エンジン実装（distance / fusion-engine / trunk-branch）</td></tr>
+                  <tr><td>C</td><td>5日</td><td>パイプライン改修（カテゴリ単位 CLI、Schema 差替）</td></tr>
+                  <tr><td>D</td><td>5日</td><td>ナラティブ層改修（幹と枝入力 + 無我表現 + 断定構文ガード）</td></tr>
+                  <tr><td>E</td><td>3日</td><td>ゴールデンサンプル + threshold 較正</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p><strong>PR #62 の扱い</strong>: <code>ObservationTreeDataSchema</code> は本改修で全面廃止対象のため、<strong>クローズ判断</strong>を推奨。流用資産（AI Gateway 認証・smoke test・パイプライン構造）は Phase C で取り込む。</p>
           </div>
         </div>
       </section>
@@ -494,11 +615,14 @@ const result = await streamText({
       <section>
         <h2>2.5 関連リンク</h2>
         <ul>
+          <li><a href="../decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md"><strong>F3.1 ワードツリー構築 改修計画</strong>（Procrustean Mapping → 幹と枝モデル）</a> — 本改修の正本</li>
+          <li><a href="../../discussions/議論ログ_ワードツリー構築改修.md">議論ログ：ワードツリー構築改修</a> — 5ターン議論完全記録</li>
           <li><a href="../requirements/cocosil_v2_detailed_requirements_specification.md">要件定義書 §4.2「性格分析・自動診断（F2）」</a></li>
-          <li><a href="../goals/f3-keyword-tree-integration.md">F3.1 観察軸ツリー設計（Tree of 4, Harvest 1.）</a></li>
+          <li><a href="../goals/f3-keyword-tree-integration.md">F3.1 観察軸ツリー設計（旧 Tree of 4, Harvest 1. — 改修により段階的廃止予定）</a></li>
           <li><a href="../../input/concepts/COCOSiL設計中枢.md">COCOSiL設計中枢 §2.2-2.3（パンチャ構造）</a></li>
           <li><code>lib/constitution/observation-axes.ts</code>（Constitution-as-Code）</li>
           <li><code>lib/constitution/banned-words.ts</code>（禁止語の正リスト）</li>
+          <li><code>lib/constitution/category-profile-schema.ts</code>（Phase A で新設予定・新スキーマの正リスト）</li>
         </ul>
       </section>
 
