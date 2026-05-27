@@ -103,18 +103,13 @@ Deep Research による本物の Step 1 本文が用意できた時点で同フ�
 ### 2.2 実行コマンド
 
 ```bash
-# OIDC token (推奨):
-node --env-file=.env.local node_modules/.bin/tsx \
-  scripts/build-observation-tree/pipeline.ts \
-  --system zodiac --axis embodied_pattern
-
-# または API key を export 済みなら:
+# OIDC ルート / API key ルート 共通 (package.json scripts が --env-file-if-exists で自動読込)
 pnpm build:observation-tree --system zodiac --axis embodied_pattern
 ```
 
-> `pnpm build:observation-tree` は `tsx` を直接呼ぶため `.env.local` を自動読み込みしない。
-> OIDC ルートでは `--env-file=.env.local` 経由で起動する必要がある。
-> （CI/永続 key ルートではシェル `export` 済みのため `pnpm` で OK）
+> package.json の `build:observation-tree` は `tsx --env-file-if-exists=.env.local` 経由で
+> 起動するため、`.env.local` があれば自動で読み込み、なければシェル export 済みの env を使う。
+> どちらのルートでも 1 コマンドで動く。
 
 ### 2.3 期待挙動
 
@@ -210,24 +205,34 @@ pnpm install
 
 ### 5.2 `[fail] VERCEL_OIDC_TOKEN も AI_GATEWAY_API_KEY も未設定`
 
-- OIDC ルート: `vercel env pull .env.local` してから `--env-file=.env.local` 経由で実行
+- OIDC ルート: `vercel env pull .env.local` してから `pnpm build:observation-tree ...` を実行（`--env-file-if-exists` が自動で `.env.local` を読込）
 - API key ルート: `export AI_GATEWAY_API_KEY=vck_...` してから実行
 
-### 5.3 `[Bad Request] 401 / 403`
+### 5.3 `GatewayInternalServerError` + statusCode 403 + `AI Gateway requires a valid credit card on file`
+
+**AI Gateway は Free credits 利用も含めてクレジットカード登録が必須**（2026-05-27 確認、Vercel 仕様）。エラーメッセージ通り以下のリンクからモーダル直開きで CC 登録する:
+
+```
+https://vercel.com/d?to=/[team]/~/ai?modal=add-credit-card
+```
+
+`[team]` はあなたの所属 Vercel チーム。登録後 5 分以内に `pnpm ai-gateway:smoke` で疎通復帰する。F3.1 パイプライン 1 セルあたり約 $0.05 のため、Free credits（通常 $5 程度）で 100 セル相当を消費可能。
+
+### 5.4 `[Bad Request] 401 / 403`（CC 登録済みの場合）
 
 OIDC token 期限切れ（12時間）。`vercel env pull .env.local` で再取得。
 
-### 5.4 Zod 違反でリトライが3回失敗
+### 5.5 Zod 違反でリトライが3回失敗
 
 `logs/{system}-{axis}-{ISO}.log` を確認し、最後の `retry_hints` で示された違反を踏まえて：
 - 入力 Markdown 本文の該当カテゴリの記述を充足する
 - もしくは `prompts/extract.md` の指示を強化する
 
-### 5.5 Critique LLM が同じバイアスを持つ疑い
+### 5.6 Critique LLM が同じバイアスを持つ疑い
 
 `prompts/critique.md` 内の「negative の見落としを最優先で疑え」指示が機能していない場合、AI Gateway で別モデル（Gemini / GPT）にフォールバックを検討。`steps/step4-critique.ts` の `EXTRACT_MODEL` 定数を変更する。
 
-### 5.6 `vercel link` でプロジェクトが見つからない
+### 5.7 `vercel link` でプロジェクトが見つからない
 
 - Vercel ダッシュで該当プロジェクトのチームスコープを確認
 - `vercel switch <team>` でスコープ切り替え後に `vercel link` を再実行
