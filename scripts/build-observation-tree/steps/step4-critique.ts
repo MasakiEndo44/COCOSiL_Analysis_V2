@@ -16,7 +16,11 @@ import {
 } from '@/lib/constitution/observation-axes'
 import type { SystemId } from '@/lib/constitution/observation-tree-schema'
 
-export const CRITIQUE_MODEL = 'anthropic/claude-sonnet-4-6'
+// デフォルトは Sonnet 4.6 (Critique の厳密判定を重視)。Free tier で動かす場合は
+// 環境変数 CRITIQUE_MODEL で Haiku 4.5 等にダウングレード可能。生成と批評の分離原則を
+// 維持するため EXTRACT_MODEL と異なるモデルにする運用も推奨される (例: Extract=Haiku,
+// Critique=Sonnet、もしくは AI Gateway で別 provider にフォールバック)。
+export const CRITIQUE_MODEL = process.env.CRITIQUE_MODEL ?? 'anthropic/claude-sonnet-4-6'
 
 const SYSTEM_LABEL_JA: Record<SystemId, string> = {
   zodiac: '12星座',

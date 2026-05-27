@@ -216,7 +216,37 @@ pnpm install
 https://vercel.com/d?to=/[team]/~/ai?modal=add-credit-card
 ```
 
-`[team]` はあなたの所属 Vercel チーム。登録後 5 分以内に `pnpm ai-gateway:smoke` で疎通復帰する。F3.1 パイプライン 1 セルあたり約 $0.05 のため、Free credits（通常 $5 程度）で 100 セル相当を消費可能。
+`[team]` はあなたの所属 Vercel チーム。登録後 5 分以内に `pnpm ai-gateway:smoke` で疎通復帰する。
+
+### 5.4 `Free tier users do not have access to this model`（CC 登録済みなのに発生）
+
+CC 登録は通っているが、**Free tier ユーザーは一部高性能モデル（Sonnet 4.6 / Opus 4.7 / GPT-4.1 等）にアクセス不可**。対応は次のいずれか:
+
+**方式 A: モデルを Haiku 4.5 にダウングレード（無課金で即動作・推奨）**
+
+```bash
+EXTRACT_MODEL=anthropic/claude-haiku-4-5 \
+CRITIQUE_MODEL=anthropic/claude-haiku-4-5 \
+  pnpm build:observation-tree --system zodiac --axis embodied_pattern
+```
+
+`scripts/build-observation-tree/steps/{step2-extract,step4-critique}.ts` のモデル定数は env で上書き可能。Haiku 4.5 は Sonnet 4.6 比で約 10 分の 1 のコスト + 同等の指示追従性（構造化抽出タスクには十分）。
+
+**方式 B: Top-up でクレジット購入（Sonnet 4.6 維持）**
+
+```
+https://vercel.com/d?to=/[team]/~/ai?modal=top-up
+```
+
+最小 $5 から購入可能。F3.1 全 20 セル本走で約 $1 の見積もり。品質を最大化する選択肢。
+
+**ハイブリッド（推奨パターン）**: 抽出は Haiku で安く、批評は Sonnet で厳密に。
+
+```bash
+EXTRACT_MODEL=anthropic/claude-haiku-4-5 \
+CRITIQUE_MODEL=anthropic/claude-sonnet-4-6 \
+  pnpm build:observation-tree --system zodiac --axis embodied_pattern
+```
 
 ### 5.4 `[Bad Request] 401 / 403`（CC 登録済みの場合）
 

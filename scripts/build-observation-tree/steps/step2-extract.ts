@@ -15,7 +15,9 @@ import {
 } from '@/lib/constitution/observation-axes'
 import type { SystemId } from '@/lib/constitution/observation-tree-schema'
 
-export const EXTRACT_MODEL = 'anthropic/claude-sonnet-4-6'
+// デフォルトは Sonnet 4.6 (品質重視・設計判断)。Free tier では Top-up 必要のため
+// 環境変数 EXTRACT_MODEL で Haiku 4.5 等にダウングレード可能。
+export const EXTRACT_MODEL = process.env.EXTRACT_MODEL ?? 'anthropic/claude-sonnet-4-6'
 
 const SYSTEM_LABEL_JA: Record<SystemId, string> = {
   zodiac: '12星座',

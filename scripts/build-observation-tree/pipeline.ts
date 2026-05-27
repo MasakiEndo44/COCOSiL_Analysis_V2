@@ -59,7 +59,13 @@ Output:
   scripts/build-observation-tree/logs/{system}-{axis}-{ISO}.log  (各段実行ログ)
 
 Env:
-  AI_GATEWAY_API_KEY  Vercel AI Gateway API key (必須)
+  VERCEL_OIDC_TOKEN   Vercel OIDC token (vercel env pull で取得・12時間期限)
+  AI_GATEWAY_API_KEY  Vercel AI Gateway API key (代替・永続)
+                      → どちらか一方必須
+  EXTRACT_MODEL       Step 2 抽出モデル上書き (default: anthropic/claude-sonnet-4-6)
+                      Free tier は anthropic/claude-haiku-4-5 を推奨
+  CRITIQUE_MODEL      Step 4 批評モデル上書き (default: anthropic/claude-sonnet-4-6)
+                      Free tier は anthropic/claude-haiku-4-5 を推奨
 
 Pipeline:
   Step 2: 本文 Markdown → JSON 抽出 (Claude Sonnet 4.6 via AI Gateway)
