@@ -6,53 +6,93 @@
 
 ---
 
-## 1. 初回セットアップ
+## 1. 初回セットアップ — 推奨フロー（OIDC token 経由）
 
-### 1.1 前提
+> Vercel AI SDK v6 は `VERCEL_OIDC_TOKEN` が環境変数にあれば AI Gateway への認証を自動で行う。
+> ローカル開発・Preview・Production で同じ仕組みで動き、永続 API key を発行する必要がない。
+> Token は **12時間で期限切れ** になるため、定期的に `vercel env pull` で再取得する。
 
-- Vercel アカウント（COCOSiL_Analysis_V2 プロジェクトへのアクセス権限）
-- 本リポジトリのローカルクローン + `pnpm install` 完了
-- Node.js 24 LTS（プロジェクトデフォルト）
-
-### 1.2 Vercel AI Gateway 有効化
-
-Vercel AI Gateway は本パイプラインの Step 2 / Step 4 で Claude Sonnet 4.6 を呼び出すための統一エンドポイント。`@ai-sdk/anthropic` を入れずに `'anthropic/claude-sonnet-4-6'` のプロバイダ文字列でモデル指定できる。
-
-1. https://vercel.com/dashboard でログイン
-2. `COCOSiL_Analysis_V2` プロジェクトを開く
-3. サイドバー **AI Gateway** → **Enable AI Gateway**
-4. **API Keys** タブで新規 API key を発行（名前は `cocosil-pipeline-local` 等）
-5. 生成された key（`vck_...` 形式）をコピー
-
-### 1.3 ローカル環境変数設定
-
-`.env.local` に追記（`.gitignore` 済み・コミット禁止）：
+### 1.1 Vercel CLI インストールとログイン
 
 ```bash
-# Vercel AI Gateway — F3.1 観察軸ツリーパイプライン用
-AI_GATEWAY_API_KEY=vck_xxxxxxxxxxxxxxxxxxxxxxxx
+# グローバル install（sudo を避けるなら npm prefix を ~/.npm-global に設定）
+npm i -g vercel
+
+# ブラウザで認証
+vercel login
 ```
 
-CLI は Node.js プロセスとして起動するため `.env.local` を自動読み込みしない。シェルで `export` するか、`dotenv-cli` 経由で実行する：
+### 1.2 プロジェクトと紐付け
 
 ```bash
-# 方式 A: シェルで export（推奨）
-export AI_GATEWAY_API_KEY=vck_xxxxxxxxxxxxxxxxxxxxxxxx
-
-# 方式 B: その場限り
-AI_GATEWAY_API_KEY=vck_xxx pnpm build:observation-tree --system zodiac --axis embodied_pattern
+# このリポジトリのルートで実行
+vercel link
+# → "Set up <repo>?" には Y
+# → "Which scope?" にチームを選択
+# → "Found project <name>. Link to it?" で COCOSiL_Analysis_V2 を選択
 ```
 
-### 1.4 設定確認
+`.vercel/project.json` が生成される（`.gitignore` 済み）。
+
+### 1.3 環境変数を pull
 
 ```bash
-echo "${AI_GATEWAY_API_KEY:?AI_GATEWAY_API_KEY 未設定}"
-# → vck_xxxx... が表示されれば OK
+vercel env pull .env.local
 ```
+
+これで `.env.local` に以下が書き込まれる（既存値はマージ）:
+
+- `VERCEL_OIDC_TOKEN=eyJ...`（12時間期限）
+- その他 Vercel プロジェクトに登録済みの env
+
+### 1.4 疎通確認（smoke test）
+
+```bash
+pnpm ai-gateway:smoke
+```
+
+期待出力:
+
+```
+[start] AI Gateway smoke test  (auth: VERCEL_OIDC_TOKEN)
+接続テスト成功
+[ok] 8 chars received in 1234ms
+```
+
+モデル: `anthropic/claude-haiku-4-5`（Sonnet より約 10倍安価、コスト < 1 cent / 回）。
+
+### 1.5 12時間ごとの token 再取得
+
+```bash
+vercel env pull .env.local
+```
+
+`[Bad Request]` や `401/403` が出たら token 期限切れのサイン。再 pull すれば直る。
 
 ---
 
-## 2. 初回実走（zodiac × embodied_pattern）
+## 1A. 代替フロー — 永続 API key（CI など）
+
+OIDC が使えない環境（CI runner で `vercel link` できない等）では永続 API key を使う。
+
+1. https://vercel.com/dashboard → COCOSiL_Analysis_V2 プロジェクト
+2. **AI Gateway** タブ → **API Keys** → 新規 key 発行（名前: `cocosil-pipeline-ci` 等）
+3. `vck_...` 形式の key をコピー
+4. 環境変数に設定:
+   ```bash
+   export AI_GATEWAY_API_KEY=vck_xxxxxxxxxxxxxxxxxxxxxxxx
+   ```
+5. 疎通確認:
+   ```bash
+   pnpm ai-gateway:smoke
+   # → [start] AI Gateway smoke test  (auth: AI_GATEWAY_API_KEY)
+   ```
+
+`env.ts` は `VERCEL_OIDC_TOKEN` と `AI_GATEWAY_API_KEY` のどちらか一方があれば動く（OIDC 優先）。
+
+---
+
+## 2. 初回パイプライン実走（zodiac × embodied_pattern）
 
 ### 2.1 入力ファイル
 
@@ -63,8 +103,18 @@ Deep Research による本物の Step 1 本文が用意できた時点で同フ�
 ### 2.2 実行コマンド
 
 ```bash
+# OIDC token (推奨):
+node --env-file=.env.local node_modules/.bin/tsx \
+  scripts/build-observation-tree/pipeline.ts \
+  --system zodiac --axis embodied_pattern
+
+# または API key を export 済みなら:
 pnpm build:observation-tree --system zodiac --axis embodied_pattern
 ```
+
+> `pnpm build:observation-tree` は `tsx` を直接呼ぶため `.env.local` を自動読み込みしない。
+> OIDC ルートでは `--env-file=.env.local` 経由で起動する必要がある。
+> （CI/永続 key ルートではシェル `export` 済みのため `pnpm` で OK）
 
 ### 2.3 期待挙動
 
@@ -91,9 +141,10 @@ pnpm build:observation-tree --system zodiac --axis embodied_pattern
 
 | 終了コード | 原因 | 対処 |
 |---|---|---|
-| 1 | `AI_GATEWAY_API_KEY` 未設定 | 1.3 で設定 |
-| 1 | inputs/ ファイルなし | 2.1 を確認 |
-| 2 | `--system` / `--axis` 不正 | `--help` で値一覧確認 |
+| 1 | env 未設定 (`VERCEL_OIDC_TOKEN` / `AI_GATEWAY_API_KEY` どちらもなし) | §1.3 または §1A |
+| 1 | `[Bad Request] 401/403` | OIDC token 12時間期限切れ。§1.5 |
+| 1 | `inputs/` ファイルなし | §2.1 を確認 |
+| 2 | `--system` / `--axis` 不正 | `pnpm build:observation-tree --help` で値一覧確認 |
 | 1 | Step 2 失敗（API 通信・Zod 違反）× 3回 | `logs/` でリトライ履歴と `retry_hints` を確認 |
 | 1 | Step 4 FAIL × 3回 | `logs/` の violations を確認、プロンプト or 入力本文を見直し |
 
@@ -104,8 +155,8 @@ pnpm build:observation-tree --system zodiac --axis embodied_pattern
 ### 3.1 ゴールデンサンプルとの diff
 
 ```bash
-diff <(jq -S . outputs/zodiac-embodied_pattern.json) \
-     <(jq -S . golden-samples/aries-embodied_pattern.json)
+diff <(jq -S . scripts/build-observation-tree/outputs/zodiac-embodied_pattern.json) \
+     <(jq -S . scripts/build-observation-tree/golden-samples/aries-embodied_pattern.json)
 ```
 
 期待される差分:
@@ -142,7 +193,7 @@ diff <(jq -S . outputs/zodiac-embodied_pattern.json) \
 zodiac × embodied_pattern が安定動作したら、以下を順次実行：
 
 1. えんまさが Deep Research で残りセルの Markdown 本文を `inputs/{system}-{axis}.md` に生成・配置
-2. `pnpm build:observation-tree --system <s> --axis <a>` で各セルを実行
+2. パイプラインを各セルで実行
 3. Step 5（人間サンプリング）を経て `lib/data/observation-tree/{system}/{axis}.json` に commit（Layer 2 Gate 2 対象）
 
 進捗管理: [docs/output/F3/deep-research-prompt-template.md](../../docs/output/F3/deep-research-prompt-template.md) §6 の20セルチェック表。
@@ -157,20 +208,30 @@ zodiac × embodied_pattern が安定動作したら、以下を順次実行：
 pnpm install
 ```
 
-### 5.2 `Error: API key not found`
+### 5.2 `[fail] VERCEL_OIDC_TOKEN も AI_GATEWAY_API_KEY も未設定`
 
-`.env.local` ではなくシェル環境変数を読むので、`export AI_GATEWAY_API_KEY=...` を実行してから `pnpm build:observation-tree`。
+- OIDC ルート: `vercel env pull .env.local` してから `--env-file=.env.local` 経由で実行
+- API key ルート: `export AI_GATEWAY_API_KEY=vck_...` してから実行
 
-### 5.3 Zod 違反でリトライが3回失敗
+### 5.3 `[Bad Request] 401 / 403`
+
+OIDC token 期限切れ（12時間）。`vercel env pull .env.local` で再取得。
+
+### 5.4 Zod 違反でリトライが3回失敗
 
 `logs/{system}-{axis}-{ISO}.log` を確認し、最後の `retry_hints` で示された違反を踏まえて：
 - 入力 Markdown 本文の該当カテゴリの記述を充足する
 - もしくは `prompts/extract.md` の指示を強化する
 
-### 5.4 Critique LLM が同じバイアスを持つ疑い
+### 5.5 Critique LLM が同じバイアスを持つ疑い
 
 `prompts/critique.md` 内の「negative の見落としを最優先で疑え」指示が機能していない場合、AI Gateway で別モデル（Gemini / GPT）にフォールバックを検討。`steps/step4-critique.ts` の `EXTRACT_MODEL` 定数を変更する。
 
+### 5.6 `vercel link` でプロジェクトが見つからない
+
+- Vercel ダッシュで該当プロジェクトのチームスコープを確認
+- `vercel switch <team>` でスコープ切り替え後に `vercel link` を再実行
+
 ---
 
-*本書は PR #62 の Follow-ups として作成。AI Gateway 設定はえんまさが手動で実施する作業。設定完了後、ヒラメが §3 検証手順を実行する。*
+*本書は PR #62 の Follow-up として作成。AI Gateway 設定はえんまさが手動で実施する作業。設定完了後、ヒラメが §3 検証手順を実行する。*

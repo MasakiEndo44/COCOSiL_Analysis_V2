@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:types": "supabase gen types typescript --project-id nrvfmvdozgavohmduttn --schema public > lib/types/database.ts",
-    "build:observation-tree": "tsx scripts/build-observation-tree/pipeline.ts"
+    "build:observation-tree": "tsx scripts/build-observation-tree/pipeline.ts",
+    "ai-gateway:smoke": "node --env-file=.env.local scripts/build-observation-tree/smoke/ai-gateway-smoke.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.60",
