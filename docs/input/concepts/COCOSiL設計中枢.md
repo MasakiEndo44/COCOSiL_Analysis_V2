@@ -122,6 +122,30 @@ COCOSiLには優れたミッション（「自分を知って、ラクになる�
 - **+1の統合**：AIがそれらを統合して**1つの立体的な自己像**を生成する
 - **これがなぜ重要か**：単一フレームでは「ラベル」しか得られない。4視点の統合があって初めて「**なぜ自分はこうなのか**」の構造的理解（腑落ち）が生まれる
 
+#### 2.3.1 実装上の翻訳：観察軸5軸（Pancha to Five Axes.）
+
+F3.1 レポート生成エンジンでは、パンチャ構造（色受想行識）を **観察軸5軸＋メタ層** として実装する。正は `lib/constitution/observation-axes.ts`（Constitution-as-Code）。
+
+| 仏教用語 | コード識別子 | 日本語表示名 | 翻訳ポリシー |
+|---|---|---|---|
+| 色（rūpa） | `embodied_pattern` | 身体・気質パターン | 直訳。物質性・身体性 |
+| 受（vedanā・内的側面） | `emotional_response` | 感情反応パターン | 内的情動として展開 |
+| 想（saṃjñā） | `cognitive_style` | 認知スタイル | 直訳。概念化作用 |
+| 行（saṃskāra） | `motivation_drive` | 動機エネルギー | 直訳。意志・形成衝動 |
+| 受（受の対人側面）＋ 行（関係への向け方） | `relational_mode` | 対人モード | 受と行の対人的合成として独立軸化 |
+| 識（vijñāna） | `META_LAYER.self_integration` | 自己統合 | **軸ではなく Harvest 結果が表現するメタ層**（vijñāna は他蘊の認識・統合作用そのもの） |
+
+**設計3原則（Pancha to Five Axes.）**
+
+1. **Four Aggregates Expand, Fifth Transcends.** — 色受想行の4蘊を5軸に展開、識は軸ではなく Harvest 結果が表現するメタ層
+2. **Minimal Signature, Rich Expression.** — 軸の `observation_keywords` は識別シグネチャ（3-5語）に限定、表現語彙の豊かさは Deep Research が担う
+3. **Priority Resolves Crossings.** — 軸間の越境概念（例: 気質）は `layer_priority` で主軸を1つ指定して解決
+
+**設計判断の根拠**:
+- 議論ログ: `docs/discussions/議論ログ_F3-1観察軸5軸確定.md`（仏教学・性格心理学の比較検証）
+- 上位設計: `docs/output/goals/f3-keyword-tree-integration.md`（Tree of 4, Harvest 1.）
+- ドリフト検知: `lib/constitution/__tests__/drift.test.ts`（CIで本ドキュメントとコードの整合を検証）
+
 ### 2.4 小我・無我・大我 — 自我の3段階
 
 解放のプロセスは、自我の3段階を経る：

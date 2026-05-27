@@ -135,6 +135,7 @@ COCOSiLは「現代の無明（むみょう）」を解消するために存在�
 - `lib/prompts/**` — AIプロンプトテンプレート（チャット3フェーズ・統合レポート・シェアカード）
 - `lib/data/**` — 4体系ナレッジ（MBTI / 星座 / 動物性格診断 / 六星占術）
 - `lib/diagnostics/**` — 診断計算ロジック（実装はヒラメ、内容承認はえんまさ）
+  - F3.1 4体系統合アルゴリズム設計（Tree of 4, Harvest 1.）: [docs/output/goals/f3-keyword-tree-integration.md](docs/output/goals/f3-keyword-tree-integration.md)
 
 ### Layer 3：開発層（AI委任OK）
 
@@ -271,6 +272,8 @@ Autogenesis Constitution（絶対不変リスト・Mutableリスト）と言語�
 | UXシーケンス順序 | `lib/constitution/ux-sequence.ts` |
 | Policy / 評価指標定義（不変） | `lib/constitution/immutables.ts` |
 | Mutable Path / Strategy（進化対象） | `lib/constitution/mutables.ts` |
+| F3.1 観察軸5軸 + メタ層（識） | `lib/constitution/observation-axes.ts` |
+| F3.1 観察軸ツリーデータ Schema | `lib/constitution/observation-tree-schema.ts` |
 
 ドリフトは `lib/constitution/__tests__/drift.test.ts`（CIで実行）が文書とコードを照合して検知する。
 
