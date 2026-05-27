@@ -1,0 +1,301 @@
+{
+  "system": "zodiac",
+  "axis": "embodied_pattern",
+  "generated_at": "2026-05-27",
+  "source_method": "deep-research-pipeline",
+  "axis_definition_used": "体質・気質・行動テンポ・エネルギー水準など、身体性に根ざした個人特性",
+  "observation_keywords_used": ["気質", "体質", "テンポ", "エネルギー", "気力"],
+  "categories": [
+    {
+      "category_id": "aries",
+      "category_label_ja": "牡羊座",
+      "features": [
+        "高熱量の胆汁質",
+        "瞬発的な動作",
+        "短期集中のテンポ",
+        "発火点の低い気質",
+        "頭部への血流集中",
+        "急性の発熱反応",
+        "回復の速い体力"
+      ],
+      "vector": "positive",
+      "confidence": 0.92,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — 牡羊座を熱乾の火の宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "William Lilly, Christian Astrology (1647), pp. 93-94 — Aries を choleric/hot-dry と分類",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "taurus",
+      "category_label_ja": "牡牛座",
+      "features": [
+        "粘り強い持久力",
+        "緩やかな起動テンポ",
+        "冷湿質の体液傾向",
+        "頸部の筋緊張",
+        "高い回復閾値",
+        "蓄積型のエネルギー",
+        "感覚器の鋭敏さ"
+      ],
+      "vector": "neutral",
+      "confidence": 0.88,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Taurus を冷乾の固定宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Demetra George, Ancient Astrology in Theory and Practice (2019), Vol. I, Ch. 5 — 固定宮の身体的持続性",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "gemini",
+      "category_label_ja": "双子座",
+      "features": [
+        "神経系優位の多血質",
+        "細かく分散する動作",
+        "高速で軽い行動テンポ",
+        "肩・腕部の可動域",
+        "呼吸が浅く速い傾向",
+        "体内蓄熱の少なさ"
+      ],
+      "vector": "positive",
+      "confidence": 0.72,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Gemini を熱湿の風の宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Robert Hand, Horoscope Symbols (1981), Ch. 6 — 双子座と神経系・呼吸器の対応",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "cancer",
+      "category_label_ja": "蟹座",
+      "features": [
+        "保水傾向の粘液質",
+        "周期的な体力の波",
+        "胃腸への負荷集中",
+        "緩慢な行動テンポ",
+        "外殻硬・内部柔の質感",
+        "むくみやすい体質"
+      ],
+      "vector": "negative",
+      "confidence": 0.78,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Cancer を冷湿の水の宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Nicholas Campion, A History of Western Astrology Vol. II (2008, Continuum), Ch. 4 — 月支配宮と体液周期",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "leo",
+      "category_label_ja": "獅子座",
+      "features": [
+        "心臓系の強い拍動",
+        "持続的な高エネルギー",
+        "胸郭の発達した体格傾向",
+        "ゆったり大きな動作",
+        "発熱しやすい胆汁質",
+        "回復力の高さ",
+        "背中・脊柱の負荷集中"
+      ],
+      "vector": "positive",
+      "confidence": 0.90,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Leo を熱乾の固定火宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Vettius Valens, Anthology, Book I (c. 2nd century CE), trans. Riley — 獅子宮と心臓・脊椎の対応",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "virgo",
+      "category_label_ja": "乙女座",
+      "features": [
+        "消化器への神経集中",
+        "低体温・冷乾質の傾向",
+        "細かい反復動作",
+        "疲弊しやすい腸管",
+        "緊張持続による硬さ",
+        "回復に時間を要する体力"
+      ],
+      "vector": "negative",
+      "confidence": 0.82,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Virgo を冷乾の柔軟宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "William Lilly, Christian Astrology (1647), pp. 99-100 — Virgo と消化器系・melancholic 体液",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "libra",
+      "category_label_ja": "天秤座",
+      "features": [
+        "温湿質の多血傾向",
+        "均整のとれた体格",
+        "腎・腰部への負担",
+        "中庸な行動テンポ",
+        "血流の安定した循環",
+        "両側対称への偏重"
+      ],
+      "vector": "neutral",
+      "confidence": 0.55,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Libra を熱湿の活動風宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Liz Greene, The Astrology of Fate (1984), Ch. 7 — 天秤座と腎・内分泌系の対応",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "scorpio",
+      "category_label_ja": "蠍座",
+      "features": [
+        "深部の持続エネルギー",
+        "低代謝で粘る体力",
+        "生殖器・排泄器の負荷",
+        "緩急の落差が大きい動作",
+        "回復に内向きな力を使う質",
+        "体内蓄熱の高さ"
+      ],
+      "vector": "neutral",
+      "confidence": 0.68,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Scorpio を冷湿の固定水宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Bernadette Brady, Astrology, A Place in Chaos (2006), Ch. 4 — 火星支配の固定宮と深部代謝",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "sagittarius",
+      "category_label_ja": "射手座",
+      "features": [
+        "広域に拡散する動作",
+        "大筋群（大腿）の発達傾向",
+        "高い基礎代謝",
+        "熱を帯びる胆汁質",
+        "疾走型の行動テンポ",
+        "屋外活動への耐性"
+      ],
+      "vector": "positive",
+      "confidence": 0.85,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Sagittarius を熱乾の柔軟火宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Robert Hand, Horoscope Symbols (1981), Ch. 6 — 射手座と肝・大腿筋系の対応",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "capricorn",
+      "category_label_ja": "山羊座",
+      "features": [
+        "冷乾質の低代謝",
+        "骨・関節の堅牢さ",
+        "長距離の持久力",
+        "重く遅い行動テンポ",
+        "膝・皮膚への負荷",
+        "蓄積型の回復パターン"
+      ],
+      "vector": "neutral",
+      "confidence": 0.80,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Capricorn を冷乾の活動土宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Demetra George, Ancient Astrology in Theory and Practice (2019), Vol. I, Ch. 5 — 土星支配宮と骨格系",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "aquarius",
+      "category_label_ja": "水瓶座",
+      "features": [
+        "末梢循環の不規則さ",
+        "神経系の高い興奮性",
+        "脛・足首部の脆さ",
+        "間欠的な行動テンポ",
+        "体温の変動幅",
+        "断続的なエネルギー放出"
+      ],
+      "vector": "neutral",
+      "confidence": 0.48,
+      "primary_sources": [
+        {
+          "citation": "William Lilly, Christian Astrology (1647), pp. 103-104 — Aquarius と循環・脛部の対応",
+          "type": "book"
+        },
+        {
+          "citation": "Nicholas Campion, A History of Western Astrology Vol. II (2008, Continuum), Ch. 6 — 土星・天王星双方支配としての気質的両義性",
+          "type": "book"
+        }
+      ]
+    },
+    {
+      "category_id": "pisces",
+      "category_label_ja": "魚座",
+      "features": [
+        "境界の弛緩した体感",
+        "高い保水・むくみ傾向",
+        "免疫の脆弱性",
+        "極めて緩慢なテンポ",
+        "足先・リンパ系の負荷",
+        "周期的な低エネルギー期"
+      ],
+      "vector": "negative",
+      "confidence": 0.62,
+      "primary_sources": [
+        {
+          "citation": "Ptolemy, Tetrabiblos, Book I, Ch. 17 (c. 2nd century CE) — Pisces を冷湿の柔軟水宮として記述",
+          "type": "book"
+        },
+        {
+          "citation": "Liz Greene, The Astrology of Fate (1984), Ch. 10 — 魚座とリンパ系・免疫脆弱性の対応",
+          "type": "book"
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:types": "supabase gen types typescript --project-id nrvfmvdozgavohmduttn --schema public > lib/types/database.ts"
+    "db:types": "supabase gen types typescript --project-id nrvfmvdozgavohmduttn --schema public > lib/types/database.ts",
+    "build:observation-tree": "tsx scripts/build-observation-tree/pipeline.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.60",
@@ -36,6 +37,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
+    "tsx": "^4.22.3",
     "typescript": "^5",
     "vitest": "^4.1.5"
   },

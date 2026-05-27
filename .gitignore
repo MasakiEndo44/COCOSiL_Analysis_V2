@@ -54,3 +54,7 @@ next-env.d.ts
 
 # vscode settings (can include secrets)
 .vscode/settings.json
+
+# F3.1 observation tree pipeline (inputs は履歴保持のため commit する)
+scripts/build-observation-tree/logs/
+scripts/build-observation-tree/outputs/
