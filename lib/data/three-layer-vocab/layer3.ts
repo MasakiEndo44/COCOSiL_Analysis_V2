@@ -80,7 +80,7 @@ export const LAYER3_VOCABULARY: Record<Layer3Phase, LayerVocabulary> = {
     { term: '無意識層センシング', source: 'Cabinet (Oxford) Four Humours', semanticTag: '動的傾向' },
     { term: '休止期リジェネレート', source: '細木数子 (1986), p.72', semanticTag: '時間特性' },
     { term: '停止フェーズ適応', source: '細木数子 (1986), p.72', semanticTag: 'フェーズ特性' },
-    { term: 'ゼロ地点リセット', source: 'Avicenna Canon of Medicine', semanticTag: '時間特性' },
+    { term: '原点への回帰', source: 'Avicenna Canon of Medicine', semanticTag: '時間特性' },
     { term: '内在的エネルギー貯留', source: 'Avicenna Canon of Medicine', semanticTag: 'フェーズ特性' },
     { term: '共感性インターフェース', source: 'Cabinet (Oxford) Four Humours', semanticTag: '動的傾向' },
     { term: '超越的ホリズム', source: 'Sadness Four Humours (Shakespeare)', semanticTag: '動的傾向' },
@@ -92,7 +92,7 @@ export const LAYER3_VOCABULARY: Record<Layer3Phase, LayerVocabulary> = {
     { term: '根源的リソース回収', source: 'Avicenna Canon of Medicine', semanticTag: '時間特性' },
     { term: '忘却期スクラップ', source: 'Sadness Four Humours (Shakespeare)', semanticTag: '時間特性' },
     { term: '減退的ボトムアウト', source: '細木数子 (1986), p.72', semanticTag: 'フェーズ特性' },
-    { term: '新月型インビジブル', source: 'Elizabethan Beliefs', semanticTag: '動的傾向' },
+    { term: '新月型の不可視性', source: 'Elizabethan Beliefs', semanticTag: '動的傾向' },
     { term: '伝統的レジリエンス', source: 'Humoralism Seasons (Becker)', semanticTag: '動的傾向' },
   ],
 } as const
