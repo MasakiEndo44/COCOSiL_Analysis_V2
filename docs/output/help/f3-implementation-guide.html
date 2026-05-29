@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="COCOSiL V2 — ヒラメ向け F3 統合レポート実装マニュアル（API / プロンプト連携 / 品質ゲート）">
+  <title>COCOSiL V2 — F3 実装マニュアル（ヒラメ向け）</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <p><span class="badge">For ヒラメ（バックエンド）</span><span class="badge">v1.0 / 2026-05-29</span></p>
+      <h1>F3 統合レポート — 実装マニュアル</h1>
+      <p class="subtitle">
+        4体系診断データを「1つの立体的な自己像」に統合し、文字崩れゼロの縦長レポートとして即時生成する。
+        本マニュアルは <code>app/api/**</code> 担当（ヒラメ）が F3.1〜F3.5 を実装するための手引き。
+        要件定義書・F3システム要件・TSKファイル・確定済みプロンプトからの引用で構成。
+      </p>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="3観点切替">
+      <button class="tab-btn" role="tab" data-target="guide-1" aria-controls="guide-1" aria-selected="false">
+        <span class="tab-index">1</span>全体像 &amp; パイプライン
+      </button>
+      <button class="tab-btn" role="tab" data-target="guide-2" aria-controls="guide-2" aria-selected="false">
+        <span class="tab-index">2</span>API 実装ガイド
+      </button>
+      <button class="tab-btn" role="tab" data-target="guide-3" aria-controls="guide-3" aria-selected="false">
+        <span class="tab-index">3</span>品質ゲート &amp; 完了定義
+      </button>
+    </nav>
+
+    <!-- ============================================================
+         GUIDE 1 : 全体像 & パイプライン
+         ============================================================ -->
+    <div class="panel" id="guide-1" role="tabpanel" aria-hidden="true">
+
+      <section>
+        <h2>1.1 F3 とは</h2>
+        <p class="lead">
+          F2で収集した4体系（<strong>星座・60type動物・六星・MBTI</strong>）を OpenAI が統合し、
+          パンチャ構造（4+1=5）の論理で「なぜ自分はこうなのか」が構造として腑落ちするレポートを生成する。
+          単なるラベルの羅列ではなく <strong>統合考察</strong> が核。
+        </p>
+        <div class="callout callout-info">
+          <strong>📍 非交渉のUXシーケンス</strong>：レポート表示の直前に必ず「安心」フェーズ（F3.2）が挟まる。
+          <code>共感 → 安心 → 分析 → 行動</code> の順序はコードレベルで保証する（F3.2 はスキップ不可）。
+        </div>
+
+        <h3>サブフィーチャーと Phase</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>内容</th><th>Phase</th><th>担当TSK</th></tr></thead>
+            <tbody>
+              <tr><td>F3.1</td><td>レポート生成エンジン（LLM→Vercel OG→Storage）</td><td>1</td><td>TSK-API-002</td></tr>
+              <tr><td>F3.2</td><td>「安心」フェーズ（UI・スキップ不可）</td><td>1</td><td>まあみ + reassurance.ts</td></tr>
+              <tr><td>F3.3</td><td>「しっくりきた」マーカー（DB記録）</td><td>1/2</td><td>TSK-API-008</td></tr>
+              <tr><td>F3.4</td><td>満足度アンケート（5段階+自由記述）</td><td>1</td><td>TSK-API-008</td></tr>
+              <tr><td>F3.5</td><td>レポート再生成（課金・30日ゲート）</td><td>3</td><td>TSK-API-009</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-success">
+          <strong>🎯 ヒラメのスコープ</strong>：F3.1初回生成（API-002）を最優先。F3.3/F3.4のDB記録（API-008）が続く。
+          F3.5再生成（API-009）は F7（Stripe）実装後の Phase 3。F3.2 のUIはまあみ担当、テキストは確定済み（<code>lib/prompts/reassurance.ts</code>）。
+        </div>
+      </section>
+
+      <section>
+        <h2>1.2 生成パイプライン</h2>
+        <div class="diagram" role="img" aria-label="F3 レポート生成パイプライン">
+          <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="f3arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#5b21b6"/>
+              </marker>
+            </defs>
+            <rect x="20" y="20" width="170" height="58" rx="10" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5"/>
+            <text x="105" y="44" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#4c1d95" text-anchor="middle">クライアント</text>
+            <text x="105" y="63" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">MBTI完了をトリガー</text>
+
+            <rect x="240" y="20" width="240" height="58" rx="10" fill="#dbeafe" stroke="#0284c7" stroke-width="1.5"/>
+            <text x="360" y="44" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#075985" text-anchor="middle">POST /api/reports/generate</text>
+            <text x="360" y="63" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">Zod検証 → Clerk JWT</text>
+
+            <rect x="530" y="20" width="170" height="58" rx="10" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="615" y="44" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#78350f" text-anchor="middle">OpenAI (LLM)</text>
+            <text x="615" y="63" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">本文JSON生成 / 30s</text>
+
+            <line x1="190" y1="49" x2="238" y2="49" stroke="#5b21b6" stroke-width="2" marker-end="url(#f3arr)"/>
+            <line x1="480" y1="49" x2="528" y2="49" stroke="#5b21b6" stroke-width="2" marker-end="url(#f3arr)"/>
+
+            <rect x="530" y="150" width="170" height="58" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+            <text x="615" y="174" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#14532d" text-anchor="middle">Vercel OG (Satori)</text>
+            <text x="615" y="193" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">1024×1792 PNG</text>
+            <line x1="615" y1="78" x2="615" y2="148" stroke="#5b21b6" stroke-width="2" marker-end="url(#f3arr)"/>
+
+            <rect x="290" y="150" width="190" height="58" rx="10" fill="#f5f5f4" stroke="#57534e" stroke-width="1.5"/>
+            <text x="385" y="174" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#1c1917" text-anchor="middle">Supabase Storage</text>
+            <text x="385" y="193" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">user-reports (RLS)</text>
+            <line x1="528" y1="179" x2="482" y2="179" stroke="#5b21b6" stroke-width="2" marker-end="url(#f3arr)"/>
+
+            <rect x="20" y="150" width="170" height="58" rx="10" fill="#f5f5f4" stroke="#78716c" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="105" y="174" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#1c1917" text-anchor="middle">lib/prompts/</text>
+            <text x="105" y="193" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">integrated-report.ts</text>
+            <line x1="190" y1="170" x2="238" y2="60" stroke="#78716c" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#f3arr)"/>
+
+            <rect x="240" y="270" width="240" height="50" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="360" y="292" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#7f1d1d" text-anchor="middle">フォールバック</text>
+            <text x="360" y="309" font-family="-apple-system, sans-serif" font-size="11" fill="#57534e" text-anchor="middle">OG失敗 → Markdown+CSS 静的</text>
+            <line x1="385" y1="208" x2="370" y2="268" stroke="#b91c1c" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#f3arr)"/>
+          </svg>
+          <p class="diagram-caption">図1: F3.1 レポート生成パイプライン（TSK-API-002）</p>
+        </div>
+        <blockquote class="quote">
+          文字レイヤーは Vercel OG が担保するため、OG生成失敗時の Markdown+CSS フォールバックでも文字崩れは起きない。
+          gpt-image-2（背景・アイコン）は Phase 3 以降の追加で、Phase 1〜2 は依存ゼロ。
+          <span class="quote-source">F3システム要件 §技術スタック / 議論ログ_imager2アーキ選定</span>
+        </blockquote>
+      </section>
+
+      <section>
+        <h2>1.3 担当境界（Protected Areas）</h2>
+        <ul>
+          <li><strong>Layer 3（AI委任OK・ヒラメ担当）</strong>：<code>app/api/**</code> のルート実装。PRレビュー前提</li>
+          <li><strong>Layer 2（えんまさ承認必須）</strong>：<code>lib/prompts/**</code>（プロンプト）/ <code>lib/data/**</code>（4体系ナレッジ）。<em>呼び出すのはOK、内容変更は Gate 2</em></li>
+          <li><strong>Layer 1（hookで自動ブロック・手動のみ）</strong>：<code>supabase/migrations/**</code> / <code>.env*</code> / RLS無効化系SQL</li>
+        </ul>
+        <div class="callout callout-info">
+          プロンプト本体（<code>integrated-report.ts</code>）は確定済み・テスト緑（PR #68）。ヒラメは <strong>import して使うだけ</strong>で、中身を書き換える場合は えんまさの Gate 2 が必要。
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         GUIDE 2 : API 実装ガイド
+         ============================================================ -->
+    <div class="panel" id="guide-2" role="tabpanel" aria-hidden="true">
+
+      <section>
+        <h2>2.1 TSK-API-002 実装ステップ</h2>
+        <ol>
+          <li>Zod（<code>zod/v4</code>）スキーマで入力（4体系データ・user_id）を検証</li>
+          <li>Clerk JWT 検証 → <code>supabase.auth.getUser()</code> でユーザー特定（<code>request.headers</code> 直読み禁止）</li>
+          <li>OpenAI（30秒タイムアウト）でレポート本文を <strong>JSON</strong> 生成。失敗時は Markdown+CSS フォールバック</li>
+          <li>生成JSONを <code>og-image.tsx</code> に流し込み <code>@vercel/og</code> で 1024×1792 PNG 化</li>
+          <li>Supabase Storage <code>user-reports</code> に <code>${user_id}/${uuid}.png</code> で保存</li>
+          <li>RLS policy で <code>user_id = auth.uid()</code> を Storage objects に適用</li>
+        </ol>
+        <div class="callout callout-info">
+          <strong>📍 Server Actions 不使用（厳格ルール）</strong>：全ビジネスロジックは <code>app/api/**</code> の Route Handler。
+          <code>"use server"</code> 関数にDB書き込み・診断計算・認証チェックを置かない。
+        </div>
+
+        <h3>想定ファイル構成（TSK-API-002）</h3>
+<pre><code>app/api/reports/
+  └── generate/route.ts          # POST /api/reports/generate
+lib/reports/
+  ├── og-image.tsx               # Vercel OG (Satori) Reactコンポーネント
+  ├── markdown-fallback.ts       # Markdown+CSS 静的フォールバック
+  ├── llm.ts                     # OpenAI レポート生成（30秒タイムアウト）
+  ├── storage.ts                 # Supabase Storage user-reports 操作
+  └── schemas.ts                 # Zod 入力 + LLM出力検証
+supabase/migrations/
+  └── (RLS policy: storage.objects user-reports)</code></pre>
+      </section>
+
+      <section>
+        <h2>2.2 プロンプト連携（最重要）</h2>
+        <p>
+          レポート本文プロンプトは <code>lib/prompts/integrated-report.ts</code>（確定済み）から2つの関数で組み立てる。
+          ヒラメはこれを呼び出して OpenAI に渡すだけ。
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>export</th><th>役割</th></tr></thead>
+            <tbody>
+              <tr><td><code>resolveIntegratedReportSystemPrompt(hasName)</code></td><td>system プロンプトを返す。<code>hasName</code> で呼称トーン（「さん」付け／「あなた」）を分岐</td></tr>
+              <tr><td><code>buildIntegratedReportUserPrompt(input)</code></td><td>4体系データ＋呼び名を流し込んだ user メッセージを返す</td></tr>
+              <tr><td><code>REPORT_SECTION_IDS</code></td><td>出力JSONのキー（=セクション）。F3.3マーカーもこのIDを参照</td></tr>
+              <tr><td><code>REPORT_SECTION_CHAR_LIMITS</code></td><td>各セクションの文字数上限（OGレイアウト崩壊防止）</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>呼び出しイメージ</h3>
+<pre><code>// lib/reports/llm.ts（抜粋・イメージ）
+import {
+  resolveIntegratedReportSystemPrompt,
+  buildIntegratedReportUserPrompt,
+} from '@/lib/prompts/integrated-report';
+
+const hasName = Boolean(displayName);
+const system = resolveIntegratedReportSystemPrompt(hasName);
+const user = buildIntegratedReportUserPrompt({
+  displayName,                                  // null なら「あなた」にフォールバック
+  zodiac:  { label: '蟹座' },
+  animal:  { label: '母性豊かな子守熊' },        // 60type character ラベル（D10）
+  sixStar: { label: '土星人＋' },
+  mbti:    { label: 'INFJ' },
+  // ② TSK-DATA 整備後は各項目に description を渡す:
+  // zodiac: { label: '蟹座', description: '…詳細説明文…' }
+});
+// → OpenAI に system / user を渡し、JSON モードで取得</code></pre>
+
+        <h3>出力JSONの構造（5セクション + キャッチフレーズ）</h3>
+<pre><code>{
+  "catchphrase":     "一言の命名（20字程度・OG見出し用）",
+  "opening":         "導入（地図メタファー）",
+  "four_lights":     "4体系それぞれの短い読み取り",
+  "integration":     "統合考察＝核（4体系横断・AC-1）",
+  "relational_hint": "大切な人との関係ヒント（AC-2）",
+  "closing":         "結び（次アクションへの招待）"
+}</code></pre>
+        <div class="callout callout-info">
+          <strong>📍 ② 詳細説明文の注入</strong>：現状プロンプトは4体系の <em>ラベルだけ</em>を渡す。
+          各タイプの詳細説明文（TSK-DATA-XXX）が揃ったら <code>SystemProfile.description</code> に流し込む。
+          未整備でもラベルのみで動作する（フォールバック設計済み）。
+        </div>
+      </section>
+
+      <section>
+        <h2>2.3 LLM 出力は単段で信用しない</h2>
+        <p>生成 → 抽出 → Schema検証 → （必要なら）再生成、の順で扱う。JSON をそのまま PNG 化しない。</p>
+        <ol>
+          <li>OpenAI を JSON モードで呼ぶ</li>
+          <li><code>JSON.parse</code> 後、<code>REPORT_SECTION_IDS</code> の全キーが揃うか Zod で検証</li>
+          <li>各セクションが <code>REPORT_SECTION_CHAR_LIMITS</code> を超えていないかチェック（超過は clamp or 再生成）</li>
+          <li>禁止語チェック（<code>findBannedWords()</code>）を出力にも通す</li>
+          <li>検証通過後に <code>og-image.tsx</code> へ</li>
+        </ol>
+        <blockquote class="quote">
+          生成→抽出→Schema→Critique→人間サンプリングの多段パイプラインが標準。単段生成の JSON を信頼しない。
+          <span class="quote-source">プロジェクト方針（LLM JSON パイプライン）</span>
+        </blockquote>
+      </section>
+
+      <section>
+        <h2>2.4 フォールバック2層</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>失敗箇所</th><th>挙動</th></tr></thead>
+            <tbody>
+              <tr><td>OpenAI タイムアウト（30s超）/ エラー</td><td>フレンドリーエラー＋リトライ導線。エラーオブジェクトをそのままクライアントに返さない</td></tr>
+              <tr><td>Vercel OG 生成失敗</td><td>Markdown+CSS 静的レポートへ即時切替。ユーザーに生成失敗を悟らせない</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>2.5 F3.3 マーカー / F3.4 アンケート（TSK-API-008）</h2>
+        <ul>
+          <li><strong>F3.3</strong>：セクション単位（<code>REPORT_SECTION_IDS</code>）でマーク記録。1タップで記録・解除（可逆）。F4.3/F5.3から参照可能にする</li>
+          <li><strong>F3.4</strong>：5段階スコア＋自由記述（空でも送信可）を記録。F9.3 KPIダッシュボード（満足度4.0目標）に集計</li>
+          <li>両テーブルとも <code>user_id = auth.uid()</code> の RLS を必ず適用（Gate 1）</li>
+        </ul>
+        <div class="callout callout-info">
+          未マーク時に「0件です」等の <strong>否定形を出さない</strong>（AC-3・設計中枢 原則②）。これはUI側の責務だがAPIの返却設計でも残件数を強調しない。
+        </div>
+      </section>
+
+      <section>
+        <h2>2.6 F3.5 再生成（TSK-API-009・Phase 3）</h2>
+        <ul>
+          <li>課金プラン限定（無料は有料誘導）・月1回上限・前回から30日ゲート</li>
+          <li>処理順：<strong>課金状態検証 → 月次枠消費 → 生成 → 保存</strong></li>
+          <li>蓄積データ（F4チャット・F3.3マーカー・F5記録）をプロンプトに注入（D3）。乏しい場合のフォールバックを用意</li>
+          <li>F3.1の生成フロー（LLM→OG→Storage）を再利用</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         GUIDE 3 : 品質ゲート & 完了定義
+         ============================================================ -->
+    <div class="panel" id="guide-3" role="tabpanel" aria-hidden="true">
+
+      <section>
+        <h2>3.1 Gate 1（ヒラメ）— 全PR必須</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>項目</th><th>観点</th></tr></thead>
+            <tbody>
+              <tr><td>IDOR防御</td><td><code>user_id = auth.uid()</code> が全CRUD操作のRLSポリシーに存在するか</td></tr>
+              <tr><td>JWT連携</td><td>Clerk JWTが <code>supabase.auth.getUser()</code> 経由（<code>request.headers</code> 直読み禁止）</td></tr>
+              <tr><td>型安全の境界</td><td>APIルート入力値が Zod スキーマで検証されているか</td></tr>
+              <tr><td>N+1・漏洩クエリ</td><td>ループ内Supabase呼び出しなし / <code>select('*')</code> で不要カラム露出なし</td></tr>
+              <tr><td>エラー境界</td><td>Supabaseエラーをそのままクライアントに返していないか</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+          認証・DB migration・API route を変更するPRは <code>/security-sensitive-change-review</code> を必ず通す。
+        </div>
+      </section>
+
+      <section>
+        <h2>3.2 非機能要件（目標値）</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>項目</th><th>目標値</th></tr></thead>
+            <tbody>
+              <tr><td>レポート生成〜表示（Vercel OG）</td><td>3秒以内</td></tr>
+              <tr><td>OpenAI コンテンツ生成</td><td>30秒以内（タイムアウト）</td></tr>
+              <tr><td>F3.2「安心」フェーズ合計</td><td>15秒以内（並行生成時 最大30秒）</td></tr>
+              <tr><td>マーカーのタップレスポンス</td><td>100ms以内</td></tr>
+              <tr><td>Supabase Storage 使用量</td><td>0.5GB上限（積極的アーカイブ）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>3.3 壊れ方3パターン（/start-task 時に宣言）</h2>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">① ロジック破綻 — 同一入力で異なる結果</button>
+          <div class="accordion-body">
+            <p>診断計算・プロンプト組み立ての確定性。Vitest unit test で確認。入力が同じなら system/user プロンプトも同一になることを保証する。</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">② 状態不整合 — 書き込んだのに読めない（RLS+JWT）</button>
+          <div class="accordion-body">
+            <p>Storage保存・マーカー記録が <code>auth.uid()</code> 境界で正しく読み書きできるか。プレビューURL＋手動ログ確認。</p>
+          </div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">③ UX断絶 — APIは動くがUIが仕様と違う</button>
+          <div class="accordion-body">
+            <p>えんまさによるプレビューURL手動確認。共感→安心→分析→行動の順序、年齢非表示、呼称トーンなどを目視。</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>3.4 実装時の落とし穴チェック</h2>
+        <ul>
+          <li><strong>年齢非表示（D9）</strong>：本文・OG・シェアカードに年齢を出さない。生年月日はフッターの計算根拠表示のみ。シェアカード（F6）には生年月日も出さない</li>
+          <li><strong>60type characterラベル（D10）</strong>：ユーザー向けは <code>character</code>（例「リーダーとなるゾウ」）。<code>baseAnimal</code> 単体は内部参照のみ</li>
+          <li><strong>display_name モデレーション（D8）</strong>：差別語・他人名・絵文字攻撃を <code>lib/constitution/</code> のルールで遮断。OG描画前に再チェック、検知時は「あなた」に置換。20文字超は clamp</li>
+          <li><strong>禁止語0%</strong>：占い/鑑定/運勢/当たる/霊感/霊視。<code>lib/constitution/banned-words.ts</code> が唯一の正。出力にも <code>findBannedWords()</code> を通す</li>
+          <li><strong>env var</strong>：<code>@/lib/env</code> の <code>getServerEnv()</code> 経由。<code>process.env.XXX</code> 直読み禁止</li>
+          <li><strong>パッケージ</strong>：<code>pnpm</code> のみ。<code>@/*</code> はプロジェクトルートにマップ（<code>src/</code> は無い）</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3.5 検証コマンド &amp; 完了の定義</h2>
+<pre><code>pnpm typecheck   # tsc --noEmit
+pnpm lint        # ESLint
+pnpm build       # Next.js build
+pnpm exec vitest run   # 単体テスト</code></pre>
+        <div class="callout callout-success">
+          <strong>機能完了 = 型チェック通過（機械）＋ ビルド成功（機械）＋ 動作確認済み（えんまさ）</strong><br>
+          「ビルドが通ったから完了」は禁止。3条件が揃うまで main マージ不可。
+        </div>
+      </section>
+
+      <section>
+        <h2>3.6 関連リンク</h2>
+        <ul>
+          <li><a href="../F3/cocosil_v2_f3_system_requirements.md">F3 システム要件定義書</a></li>
+          <li><a href="../tasks/TSK-API-002-f3-report-api.md">TSK-API-002（レポート生成API）</a></li>
+          <li><a href="../tasks/TSK-API-008-f3-report-records-api.md">TSK-API-008（マーカー/アンケート）</a></li>
+          <li><a href="../tasks/TSK-API-009-f3-report-regenerate-api.md">TSK-API-009（再生成）</a></li>
+          <li><a href="../tasks/TSK-PROMPT-001-f3-report-prompt.md">TSK-PROMPT-001（プロンプト・PR #68）</a></li>
+          <li><a href="../F3/TSK-PROMPT-001_sample-outputs.md">プロンプト出力サンプル3件</a></li>
+          <li><a href="./index.html">メンバー説明ドキュメント（AI SDK / 統合メソッド）</a></li>
+        </ul>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      <span>最終更新: 2026-05-29</span>
+      <span>対象: ヒラメ（バックエンド / app/api/**）</span>
+      <span><a href="../F3/cocosil_v2_f3_system_requirements.md">F3 システム要件</a></span>
+      <span><a href="./index.html">← メンバー説明ドキュメント</a></span>
+    </footer>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
