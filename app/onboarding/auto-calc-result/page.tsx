@@ -32,34 +32,42 @@ function getAnimalDescription(animalCharacter: string): string {
   return ANIMAL_DESCRIPTIONS[animalCharacter] ?? ANIMAL_DESCRIPTIONS.default;
 }
 
-// 星座SVGアイコン（シンプルな円＋星）
+// 星座SVGアイコン（星を線で結ぶコンステレーション）
 function ZodiacIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
       <circle cx="24" cy="24" r="22" stroke="#a78bfa" strokeWidth="1.5" fill="rgba(167,139,250,0.08)"/>
-      <circle cx="24" cy="24" r="3" fill="#a78bfa"/>
-      <circle cx="24" cy="10" r="2" fill="#c4b5fd"/>
-      <circle cx="24" cy="38" r="2" fill="#c4b5fd"/>
-      <circle cx="10" cy="24" r="2" fill="#c4b5fd"/>
-      <circle cx="38" cy="24" r="2" fill="#c4b5fd"/>
-      <circle cx="14" cy="14" r="1.5" fill="#ddd6fe"/>
-      <circle cx="34" cy="14" r="1.5" fill="#ddd6fe"/>
-      <circle cx="14" cy="34" r="1.5" fill="#ddd6fe"/>
-      <circle cx="34" cy="34" r="1.5" fill="#ddd6fe"/>
+      <polyline
+        points="17,15 28,12 34,22 27,31 15,28"
+        stroke="#ddd6fe"
+        strokeWidth="1"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="17" cy="15" r="3" fill="#7c5cfc" />
+      <circle cx="28" cy="12" r="2" fill="#c4b5fd" />
+      <circle cx="34" cy="22" r="2" fill="#c4b5fd" />
+      <circle cx="27" cy="31" r="2" fill="#c4b5fd" />
+      <circle cx="15" cy="28" r="2" fill="#c4b5fd" />
+      <g stroke="#ddd6fe" strokeWidth="0.75" strokeLinecap="round">
+        <line x1="37" y1="31" x2="37" y2="35" />
+        <line x1="35" y1="33" x2="39" y2="33" />
+      </g>
     </svg>
   );
 }
 
-// 動物SVGアイコン（足跡）
+// 動物SVGアイコン（肉球）
 function AnimalIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
       <circle cx="24" cy="24" r="22" stroke="#a78bfa" strokeWidth="1.5" fill="rgba(167,139,250,0.08)"/>
-      <ellipse cx="24" cy="28" rx="8" ry="6" fill="#c4b5fd"/>
-      <ellipse cx="16" cy="20" rx="3.5" ry="4.5" fill="#c4b5fd"/>
-      <ellipse cx="32" cy="20" rx="3.5" ry="4.5" fill="#c4b5fd"/>
-      <ellipse cx="20" cy="15" rx="2.5" ry="3" fill="#ddd6fe"/>
-      <ellipse cx="28" cy="15" rx="2.5" ry="3" fill="#ddd6fe"/>
+      <ellipse cx="24" cy="29" rx="7" ry="5.5" fill="#a78bfa" />
+      <circle cx="15" cy="22" r="3" fill="#c4b5fd" />
+      <circle cx="33" cy="22" r="3" fill="#c4b5fd" />
+      <circle cx="20" cy="16" r="2.5" fill="#c4b5fd" />
+      <circle cx="28" cy="16" r="2.5" fill="#c4b5fd" />
     </svg>
   );
 }
