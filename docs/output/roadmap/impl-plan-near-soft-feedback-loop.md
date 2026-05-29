@@ -7,7 +7,7 @@ author: ヒラメ
 created_at: 2026-05-03
 branch: feature/near-soft-feedback-loop
 related_requirements: docs/output/requirements/cocosil_v2_detailed_requirements_specification.md#411
-related_discussion: docs/discussions/議論ログ_デジタル生命体移行企画.md
+related_discussion: docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md
 ---
 
 # NEARフェーズ ソフトフィードバックループ 実装計画

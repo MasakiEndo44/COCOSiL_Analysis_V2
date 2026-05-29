@@ -3,8 +3,8 @@
 // 識（vijñāna）は軸ではなく Harvest 結果が表現するメタ層に置く（META_LAYER）。
 //
 // 根拠:
-//   - docs/discussions/議論ログ_F3-1観察軸5軸確定.md
-//   - docs/discussions/議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
+//   - docs/discussions/20260527_議論ログ_F3-1観察軸5軸確定.md
+//   - docs/discussions/20260527_議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
 //   - docs/output/goals/f3-keyword-tree-integration.md
 //
 // 設計3原則 (Pancha to Five Axes.):
@@ -61,7 +61,7 @@ export const OBSERVATION_AXES = {
 } as const
 
 // 識（vijñāna）— 軸ではなく Harvest 結果が表現するメタ層
-// LLM プロンプトで「軸」として扱ってはいけない（議論ログ_F3-1観察軸5軸確定 Turn 4 R2）
+// LLM プロンプトで「軸」として扱ってはいけない（20260527_議論ログ_F3-1観察軸5軸確定 Turn 4 R2）
 export const META_LAYER = {
   id: 'self_integration',
   label_ja: '自己統合（識）',

@@ -72,7 +72,7 @@ describe('Constitution Drift: 文書とコードの整合性検知', () => {
 })
 
 describe('Observation Axes: F3.1 Tree of 4, Harvest 1. の5軸内部整合性', () => {
-  test('5軸ちょうどが定義されている（4軸・6軸への変更は議論ログ_F3-1観察軸5軸確定 §Turn 2 で却下済み）', () => {
+  test('5軸ちょうどが定義されている（4軸・6軸への変更は20260527_議論ログ_F3-1観察軸5軸確定 §Turn 2 で却下済み）', () => {
     expect(OBSERVATION_AXIS_IDS).toHaveLength(5)
   })
 

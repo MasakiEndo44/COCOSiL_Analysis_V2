@@ -30,7 +30,7 @@ related_impl_plan: ""
 
 | 種別 | パス | 参照箇所 |
 |------|------|---------|
-| 議論ログ | [議論ログ_開発体制強化設計.md](../../discussions/議論ログ_開発体制強化設計.md) | Turn 5 設計原則 |
+| 議論ログ | [20260507_議論ログ_開発体制強化設計.md](../../discussions/20260507_議論ログ_開発体制強化設計.md) | Turn 5 設計原則 |
 | ハーネス | [AGENTS.md](../../../AGENTS.md) | §7〜9 |
 
 ---
@@ -47,7 +47,7 @@ docs/
   │   ├── TSK-UI-001-f2-ui-component-design.md  # 新規
   │   └── TSK-DOCS-001-dev-harness-task-management.md  # このファイル
   └── discussions/
-      └── 議論ログ_開発体制強化設計.md          # 新規
+      └── 20260507_議論ログ_開発体制強化設計.md          # 新規
 
 .claude/commands/
   ├── start-task.md                          # 変更: Step 2.6追加
@@ -61,7 +61,7 @@ docs/
 
 ## 実装ステップ
 
-1. ✅ 議論ログ保存（`docs/discussions/議論ログ_開発体制強化設計.md`）
+1. ✅ 議論ログ保存（`docs/discussions/20260507_議論ログ_開発体制強化設計.md`）
 2. ✅ TSKテンプレート作成（`docs/output/tasks/_TEMPLATE.md`）
 3. ✅ TASK-INDEX.md作成
 4. ✅ GH Issue #27（DB整理）・#28（F2 UI）作成

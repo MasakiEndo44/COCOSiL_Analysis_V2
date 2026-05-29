@@ -5,7 +5,7 @@ status: draft
 related_features: [F3.1]
 related_capabilities: [CAP-4体系統合した立体的な自己像（識）]
 related_discussions:
-  - docs/discussions/議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
+  - docs/discussions/20260527_議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
 related_features_doc: docs/output/F3/F3_integrated-report_features.md
 related_requirements:
   - docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3
@@ -273,4 +273,4 @@ F3.1 受け入れ基準 AC-1 が「統合考察1セクション以上（人間�
 
 ---
 
-*本書は goal-grill（3層 Vision/Outcome/Eval）2026-05-26 セッションの成果物。議論基盤: `docs/discussions/議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md`*
+*本書は goal-grill（3層 Vision/Outcome/Eval）2026-05-26 セッションの成果物。議論基盤: `docs/discussions/20260527_議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md`*

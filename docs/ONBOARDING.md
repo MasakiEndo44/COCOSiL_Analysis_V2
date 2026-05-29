@@ -40,7 +40,7 @@ audience: [hirame, maami, ai-agent]
 ## 設計中枢（Layer 0）— すべての判断の最上位基準
 
 > 全文: [docs/input/concepts/COCOSiL設計中枢.md](input/concepts/COCOSiL設計中枢.md)  
-> 議論ログ: [docs/discussions/議論ログ_設計中枢.md](discussions/議論ログ_設計中枢.md)
+> 議論ログ: [docs/discussions/20260503_議論ログ_設計中枢.md](discussions/20260503_議論ログ_設計中枢.md)
 
 COCOSiLのすべての機能・コピー・プロンプトの判断は、次の**Why → How → So What**の三段論法に基づく:
 
