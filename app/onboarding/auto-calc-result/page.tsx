@@ -64,15 +64,26 @@ function AnimalIcon() {
   );
 }
 
-// 六星SVGアイコン（惑星＋リング）
+// 六星SVGアイコン（中心の自己＋正六角形に並ぶ6つの星）
 function SixStarIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
       <circle cx="24" cy="24" r="22" stroke="#a78bfa" strokeWidth="1.5" fill="rgba(167,139,250,0.08)"/>
-      <circle cx="24" cy="24" r="8" fill="#c4b5fd"/>
-      <ellipse cx="24" cy="24" rx="18" ry="6" stroke="#a78bfa" strokeWidth="1.5" fill="none"/>
-      <circle cx="38" cy="20" r="2" fill="#ddd6fe"/>
-      <circle cx="11" cy="28" r="1.5" fill="#ddd6fe"/>
+      <g stroke="#ddd6fe" strokeWidth="0.75">
+        <line x1="24" y1="24" x2="24" y2="9" />
+        <line x1="24" y1="24" x2="37" y2="16.5" />
+        <line x1="24" y1="24" x2="37" y2="31.5" />
+        <line x1="24" y1="24" x2="24" y2="39" />
+        <line x1="24" y1="24" x2="11" y2="31.5" />
+        <line x1="24" y1="24" x2="11" y2="16.5" />
+      </g>
+      <circle cx="24" cy="9" r="2.5" fill="#7c5cfc" />
+      <circle cx="37" cy="16.5" r="2.5" fill="#c4b5fd" />
+      <circle cx="37" cy="31.5" r="2.5" fill="#c4b5fd" />
+      <circle cx="24" cy="39" r="2.5" fill="#c4b5fd" />
+      <circle cx="11" cy="31.5" r="2.5" fill="#c4b5fd" />
+      <circle cx="11" cy="16.5" r="2.5" fill="#c4b5fd" />
+      <circle cx="24" cy="24" r="5.5" fill="#a78bfa" />
     </svg>
   );
 }

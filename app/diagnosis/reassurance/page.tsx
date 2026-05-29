@@ -118,6 +118,36 @@ function FluidOrb() {
           }
         `}</style>
       </div>
+      {/* ノイズグラデーション（2層） — グラデーションのバンディングを消し有機的な質感を与える */}
+      {/* 層1：粒状スプリンクル（高密度・高コントラスト） */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          mixBlendMode: "overlay",
+          opacity: 0.55,
+          pointerEvents: "none",
+        }}
+      />
+      {/* 層2：粗い有機ムラ（大きなうねりで奥行きを出す） */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "50%",
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E\")",
+          backgroundSize: "100% 100%",
+          mixBlendMode: "soft-light",
+          opacity: 0.14,
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }
