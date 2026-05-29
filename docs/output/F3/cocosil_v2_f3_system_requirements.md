@@ -22,12 +22,24 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 - `docs/output/F3/F3_integrated-report_features.md` — requirements-grillによるF3精緻化（2026-05-21、5サブフィーチャー全8問完了）
 - `docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3` — 既存詳細要件（2026-05-03初版）
 - `docs/output/requirements/cocosil_v2_system_requirements.md` — Stage 1要件（F3.1〜F3.5）
-- `docs/discussions/議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則
-- `docs/discussions/議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
-- `docs/discussions/議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（ユーザーネーム / 生年月日 / 60type化）の確定議論
+- `docs/discussions/20260503_議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則
+- `docs/discussions/20260507_議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
+- `docs/discussions/20260525_議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（ユーザーネーム / 生年月日 / 60type化）の確定議論
 - `lib/data/animal-characters.ts` — 60アニマル基本データ（ID 1〜60・`baseAnimal`/`character`/`color` 整備済み）
 - `lib/data/destiny-number-database.ts` — 1930-2030年 運命数DB（60type算出ロジックの土台）
 - `AGENTS.md §0, §7` — 設計中枢・Protected Areas
+
+#### v1.2 で追加された情報源（PR#66 関連）
+
+- `docs/output/decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md` — Procrustean → 幹と枝 改修計画（b3391ce、D11〜D13 の論拠）
+- `docs/discussions/議論ログ_ワードツリー構築改修.md` — Procrustean Mapping 問題の診断議論
+- `docs/discussions/20260529_議論ログ_F3要件書アップデート方針.md` — 本 v1.2 改訂方針の議論（2026-05-29）
+- `docs/output/goals/f3-keyword-tree-integration.md` — Tree of 4, Harvest 1. Vision/Outcome/Eval
+- `lib/constitution/three-layer-model.ts` — N:M 確率 + 階層別 α + Layer 3 Modulator（f821408）
+- `lib/constitution/observation-axes.ts` — 5 観察軸 + 識メタ層
+- `lib/data/three-layer-vocab/twigs/` — 4 体系葉ノード語彙コーパス 884 語（5b84c47）
+- `lib/diagnostics/integration/` — Trunks / Probability / Hybrid Distance / Harvest 純関数群（3969462）
+- `scripts/build-observation-tree-v2/` — 観察軸ツリービルドパイプライン v2（16f866f）
 
 ### 置いた仮定
 
@@ -56,6 +68,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | D8 | F3レポートのユーザーネーム表示 | F1で自由入力したユーザーネームをF3レポート内・OG画像内で表示し「私のレポート感」を高める。`profiles.display_name TEXT NOT NULL DEFAULT 'あなた'`。モデレーション（差別語・他人名等）はConstitution化。OG描画は20文字超でclamp。**呼称トーン（「○○さん」 vs 呼び捨て）はえんまさ確定（Gate 2対象）** | F3.1 / F1要件書 |
 | D9 | F3レポートの生年月日・年齢の表示 | **年齢は表示しない**（設計中枢 Q2「三毒増幅禁止」回避：「30歳のあなたへ」表記が焦り・嫉妬・自己否定を誘発するリスク）。生年月日は4体系（星座・六星）計算根拠としてフッターレベルの控えめ表示。シェアカード（F6）には出さない | F3.1 / F6 |
 | D10 | 動物性格診断の type 数 | **60type を採用**（12type ではなく）。基本データ `lib/data/animal-characters.ts`（ID 1〜60・`baseAnimal`/`character`/`color` 整備済み）、算出土台 `lib/data/destiny-number-database.ts`（1930-2030年運命数DB）を使用。**レポート用詳細説明文の整備は TSK-DATA-XXX 並行タスクで完了させる前提**。F2 API は 60type ID + character ラベルを返す | F2 / F3.1 / lib/data |
+| D11 | 4 体系統合アルゴリズムの実装手法選択（PR#66 b3391ce 計画書からの変更） | **N:M 確率 + 階層別 α + Hybrid Distance（Rule ⊕ Embedding stub）を採用**。当初計画（b3391ce）は EMD + AGNES 階層クラスタリングだったが、(a) Node.js 互換 EMD ライブラリの不確実性、(b) 100 カテゴリ JSON の初期データ作成負荷（50 時間）、(c) Hybrid Distance のほうが Constitution-as-Code との整合性が高い（`HYBRID_DISTANCE_ALPHA` を Constitution に閉じ込められる）の 3 理由で再選択。設計 3 原則（Profiles over Cells. / Geometric Fusion, LLM Narration. / Anatta-Aware Output.）は不変。詳細根拠は `lib/diagnostics/integration/` の各モジュールコメント参照 | F3.1.11 / F3.1.15 / `lib/diagnostics/integration/` |
+| D12 | 葉ノードデータ構造の選択（PR#66 b3391ce 計画書からの変更） | **`lib/data/three-layer-vocab/twigs/` に 4 体系合計 884 語の語彙コーパスとして整備**。当初計画（b3391ce）は `lib/data/categories/{system}-{category}.json` × 100 ファイルだったが、(a) 既存 Q5a〜Q5d Deep Research 出力との連続性、(b) drift test の単純化（`twigs/animal.ts` と `animal-characters.ts` の公式呼称完全一致を Vitest で強制）、(c) TypeScript モジュールの型安全性、(d) 60 体動物名のマッピング表（`docs/output/F3/animal-60-name-mapping.md`）との整合の 4 理由で TS モジュール形式を採用。**D10 の 60type 公式呼称データは Q5b twigs として完全再活用（破棄なし）** | F3.1.11 / F3.1.12 / `lib/data/three-layer-vocab/twigs/` |
+| D13 | 設計 3 原則の Constitution-as-Code 化範囲 | **以下を Constitution として固定化、要件書はシンボル参照のみ**: ① N:M 確率行列（`LAYER2_TO_LAYER1`）/ 階層別 α（`HYBRID_DISTANCE_ALPHA`）/ Layer 3 Modulator（`LAYER3_TO_LAYER1_MODULATION`）→ `lib/constitution/three-layer-model.ts`。② 5 観察軸 + 識メタ層 → `lib/constitution/observation-axes.ts`。③ 禁止語彙 → `lib/constitution/banned-words.ts`。④ **Anatta-Aware Output 構文ガード（新設予定）** → `lib/constitution/banned-output-patterns.ts`（Phase 1 内実装）。要件書には数値・正規表現を直接書かず、シンボル名のみ記述（drift 予防） | 全 F3.1.X / Stage 2 §4.1A / §4.1B |
 
 ---
 
@@ -75,6 +90,11 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | F3.1.8 | ユーザーネーム表示（D8） | 必須 | F1で入力された `profiles.display_name` をレポート本文の冒頭または見出しで表示。OG画像内にも描画（20文字超は省略表示）。未入力時は「あなた」にフォールバック。呼称トーン（「○○さん」 vs 呼び捨て）はえんまさ設計（Gate 2対象）。AIプロンプトに `display_name` を注入する形で実現（4体系統合考察セクションでも「○○さんは〜」のトーン使用可）|
 | F3.1.9 | 生年月日表示・年齢非表示（D9） | 必須 | レポート末尾フッター等の控えめな位置に生年月日を表示（4体系計算根拠としての透明性確保）。**年齢は表示しない**（設計中枢 Q2回避）。F2で既収集の生年月日を参照。シェアカード（F6）には出さない |
 | F3.1.10 | 60アニマル参照（D10） | 必須 | F2 API が返す 60type ID および `character` ラベル（`lib/data/animal-characters.ts` 由来）をレポート内・プロンプト・OG描画で使用する。12type（`baseAnimal`）は内部参照のみ、ユーザー向け文言は 60type の `character` ラベル（例：「気分屋の猿」「リーダーとなるゾウ」）を優先表示。**TSK-DATA-XXX（60typeレポート用詳細説明文整備）の完了を前提とする** |
+| F3.1.11 | **Trunks → Harvest 接続（D11）** | **必須** | レポート生成 API（POST `/api/reports/generate`）は受領した 4 体系診断データを `lib/diagnostics/integration/` の `harvest()` 純関数に渡し、戻り値 `HarvestResult`（5 軸スコア + 識メタ + Trunks + Layer 1 確率分布）を OpenAI プロンプトに context として注入する。決定論的計算（LLM 不使用）で B-3（再現性破綻）を構造的に防ぐ。詳細は Stage 2 §4.1A |
+| F3.1.12 | 5 軸スコアの可視化 | 重要 | `HarvestResult.axisScores`（embodied_pattern / emotional_response / cognitive_style / motivation_drive / relational_mode の 5 軸、各 0-1）をレポート本文「あなたの観察軸プロファイル」セクションでバー等で可視化。Phase 1 は数値テキストのみ可、Phase 2 でグラフ拡張。UI 設計はまあみ担当（Gate 2） |
+| F3.1.13 | Layer 1（4 元素）確率分布の可視化 | 任意 | `HarvestResult.layer1Distribution`（fire/earth/air/water 確率、Σ=1.00）をレポート末尾フッターでパイチャート風に表示。Phase 2 以降の任意機能。Phase 1 では含めない |
+| F3.1.14 | **Anatta-Aware Output 構文ガード（D13）** | **必須** | レポート本文 / F3.2 安心サブテキスト / 4 体系統合考察セクションで、断定構文（「あなたは〇〇です」「〇〇である」「〇〇タイプです」「必ず〇〇する」等）の使用率 **0%** を要件化。検出は `lib/constitution/banned-output-patterns.ts`（Phase 1 内に新設）で機械化、CI で `ReportContent.includes(BANNED_OUTPUT_PATTERN)` のテストを必須化。推奨構文（「〇〇な傾向」「特に〇〇な状況で」「〜輪郭」「〜構成」）は Stage 2 §4.1B に定義。**Gate 2 必須** |
+| F3.1.15 | Layer 3（フェーズ）変調 | 重要 | ユーザーの現在の季節フェーズ（春 / 夏 / 秋 / 冬）を `UserDiagnosticInput.phase` として受け取り `harvest()` に渡す。Layer 1 確率分布が `LAYER3_TO_LAYER1_MODULATION` の値域（±0.3）で変調される。フェーズ未指定時は変調なし。Phase 1 は MBTI 入力時にユーザーが任意で指定可、Phase 2 で UI 改善（要確認: 自動判定 or 明示選択） |
 
 ### F3.2: 「安心」フェーズ
 
@@ -145,6 +165,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | セキュリティ | ユーザーネーム自由入力のモデレーション（D8） | 差別語・他人名・絵文字攻撃の検出・拒否ルールを `lib/constitution/` 配下に追加 | 自由入力ゆえのブランド毀損・他害リスクの遮断。Constitution化により実装層と分離 |
 | ユーザビリティ | OG画像内ユーザーネームの文字数制限（D8） | 20文字超は省略表示（例：「みさき子のチームリーダーで…さん」→ 16文字程度でclamp） | Vercel OG の縦長レイアウト崩壊防止 |
 | プライバシー | 生年月日のシェアカード非表示（D9） | F6シェアカード生成時に生年月日フィールドを必ず除外 | 個人特定情報のSNS露出防止。F6側でも要件化 |
+| ユーザビリティ | Anatta-Aware Output（D13） | レポート本文・F3.2サブテキスト・統合考察セクションで断定構文（「あなたは〇〇です」等）の使用率 **0%** | `lib/constitution/banned-output-patterns.ts`（Phase 1内に新設）が CI で検証。設計中枢 原則②（三毒増幅禁止）+ 設計3原則③（Anatta-Aware Output）の構造的実装 |
+| 再現性 | F3.1 統合アルゴリズムの決定論性（D11） | 同一 `UserDiagnosticInput` に対して `harvest()` が同一の `HarvestResult` を返す | Vitest で同一入力×10 回テストを CI 必須化。LLM 不使用の純関数で保証（B-3 防止） |
+| 保守性 | Constitution-as-Code との drift 予防（D13） | 数値（α・確率行列等）と正規表現（断定構文ガード）は Constitution が単一の真実。要件書・プロンプトはシンボル参照のみ | `lib/constitution/__tests__/drift.test.ts` が AGENTS.md / 要件書とコードの整合性を CI で検証 |
 
 ---
 
@@ -152,7 +175,7 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 
 | レイヤー | 技術 | 選定理由 |
 |---------|------|----------|
-| レポート整形・画像生成 | Vercel OG（Satori）| 文字崩れゼロ・サーバーサイドで即時生成・Next.js App Routerとの親和性が高い。Gamma API（月額約2万円）からの移行で大幅コスト削減。詳細: `docs/discussions/議論ログ_imager2アーキ選定.md` |
+| レポート整形・画像生成 | Vercel OG（Satori）| 文字崩れゼロ・サーバーサイドで即時生成・Next.js App Routerとの親和性が高い。Gamma API（月額約2万円）からの移行で大幅コスト削減。詳細: `docs/discussions/20260507_議論ログ_imager2アーキ選定.md` |
 | ビジュアル背景・アイコン（Phase 3以降） | gpt-image-2（OpenAI） | 文字レイヤーはVercel OGが担保。背景・アイコン専用として追加。Phase 1〜2は非使用 |
 | コンテンツ生成AI | OpenAI（GPT-4o系）| 4体系統合の複雑な推論に必要な高品質なLLM。COCOSiLの既存技術選定に一致 |
 | データ永続化（レポート画像） | Supabase Storage | ユーザーごとのPNG保存。RLSによるアクセス制御。無料枠0.5GBの制約内で積極的アーカイブ戦略 |
@@ -181,6 +204,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 - F3.1.8〜10: ユーザーネーム表示（D8）/ 生年月日表示・年齢非表示（D9）/ 60アニマル参照（D10）の実装
 - TSK-DATA-XXX: 60typeレポート用詳細説明文の整備（並行タスク・Phase 1着手前完了が望ましい）
 - ユーザーネームモデレーションルールの `lib/constitution/` 配下への追加（Gate 2対象）
+- **F3.1.11: Trunks → Harvest 接続（D11）** — TSK-API-002 改修。API ルート内で `harvest()` を呼び `HarvestResult` をプロンプトに注入
+- **F3.1.14: Anatta-Aware Output 構文ガード（D13）** — `lib/constitution/banned-output-patterns.ts` 新設（Gate 2対象）+ CI テスト追加
+- **F3.1.15: Layer 3 Modulator** — `UserDiagnosticInput.phase` の受け渡しを F2 / F3.1 API で確立（要 F2 側調整）
 
 ### Phase 2: F3 継続性検証（F3.3利用率）
 **目的**: F3.3マーカーの利用率10%以上を検証し、未達の場合は3スプリント以内に再設計する。F4.3/F5.3との連携を確認する。
@@ -237,6 +263,9 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 | ユーザーネーム自由入力の不適切値混入（D8） | 「ばかさんの性格分析」等のシュールな出力・差別語の他害 | `lib/constitution/` のモデレーションルールで遮断。OG描画前に再度チェック。検知時はフォールバック「あなた」に置換 |
 | ユーザーネームのOG描画レイアウト崩壊（D8） | 20文字超のネームでVercel OG縦長レイアウト破綻 | OG描画レイヤーで文字数clamp（20文字超は省略表示）。ユニットテストでclamp動作を保証 |
 | 60アニマル詳細説明文の整備遅延（D10） | F3.1プロンプトが空・低品質な出力 | TSK-DATA-XXX を Phase 1着手前に完了させる。間に合わない場合は character ラベルのみ参照のフォールバックプロンプトを準備 |
+| アルゴリズム実装と Constitution-as-Code の drift（D13） | レポート生成結果が要件書記述と不一致、デバッグ困難 | drift test（`lib/constitution/__tests__/drift.test.ts`）が AGENTS.md / 要件書とコードの照合を CI 実行。要件書には数値を直接書かずシンボル参照のみとする運用を徹底 |
+| Procrustean Mapping 問題の再発（PR#66 b3391ce 由来） | 4 体系の 1 体系 = 1 軸への強制マッピングで副次的特徴のみ拾う品質劣化 | 設計 3 原則「Profiles over Cells.」を要件書に明文化（D13）、`harvest()` が 5 軸プロファイルを保持する構造で構造的に防止。アルゴリズム変更時は本要件書 D11 への追記必須 |
+| Anatta-Aware 構文ガード未実装によるレポート品質劣化（D13） | 「あなたは〇〇です」等の断定構文がレポート本文に混入し、設計中枢 原則②（三毒増幅禁止）違反 | `lib/constitution/banned-output-patterns.ts` を Phase 1 内に必ず新設。CI で全プロンプトテンプレート + 生成サンプルを正規表現検査 |
 
 ---
 
@@ -263,6 +292,16 @@ F3「統合レポート」は、COCOSiL V2の全UX体験の中核をなすフィ
 
 ---
 
-> *本ドキュメントは 2026-05-24 時点のF3「統合レポート」システム要件定義書（Stage 1）です。詳細要件定義書（Stage 2）への展開時に、必要に応じて本ドキュメントを更新してください。*
+> *本ドキュメントは 2026-05-29 時点の F3「統合レポート」システム要件定義書（Stage 1 / v1.2）です。詳細要件定義書（Stage 2 / v1.2）への展開時に、必要に応じて本ドキュメントを更新してください。*
 >
-> *主要素材: `docs/output/F3/F3_integrated-report_features.md`（2026-05-21）/ `docs/output/requirements/cocosil_v2_system_requirements.md` / `docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3`*
+> *主要素材: `docs/output/F3/F3_integrated-report_features.md`（2026-05-21）/ `docs/output/requirements/cocosil_v2_system_requirements.md` / `docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3` / `docs/output/decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md`（PR#66 b3391ce）*
+>
+> *v1.2 改訂方針: `docs/discussions/議論ログ_F3要件書アップデート方針.md`（2026-05-29、専門家×みさき 5 ターン議論）*
+
+### バージョン履歴
+
+| バージョン | 日付 | 概要 |
+|---|---|---|
+| v1.0 | 2026-05-24 | 初版作成（requirements-grill F3 セッション成果物） |
+| v1.1 | 2026-05-25 | D8 / D9 / D10（ユーザーネーム / 生年月日 / 60type化）追加 |
+| **v1.2** | **2026-05-29** | **D11 / D12 / D13（PR#66 b3391ce 計画書→実装の乖離理由を明文化）+ F3.1.11〜15（Trunks→Harvest 接続・5軸スコア・Layer1分布・Anatta-Aware 構文ガード・Layer3 Modulator）+ 非機能要件 4 件 + リスク 4 件追加。改修方針 3 原則（Append, Don't Rewrite / Constitution Holds Values, Spec Holds Pointers / Layered Disclosure by Role）に基づく in-place 改訂。Gate 2 えんまさ承認待ち。** |

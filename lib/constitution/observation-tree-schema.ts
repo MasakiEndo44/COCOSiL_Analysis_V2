@@ -4,7 +4,7 @@
 //
 // 根拠:
 //   - docs/output/F3/observation-tree-pipeline.md（パイプライン全体設計）
-//   - docs/discussions/議論ログ_F3-1観察軸5軸確定.md
+//   - docs/discussions/20260527_議論ログ_F3-1観察軸5軸確定.md
 //   - lib/constitution/observation-axes.ts（軸の単一の真実）
 //   - lib/constitution/banned-words.ts（禁止語彙の単一の真実）
 //

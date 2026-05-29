@@ -29,7 +29,7 @@ open docs/output/help/index.html
 
 | タブ | 観点 | 主な引用元 |
 |---|---|---|
-| **観点1** | AI SDK の技術スタック | 要件定義書 §6.3 / §7.1 / 議論ログ_AIチャット技術スタック選定.md |
+| **観点1** | AI SDK の技術スタック | 要件定義書 §6.3 / §7.1 / 20260505_議論ログ_AIチャット技術スタック選定.md |
 | **観点2** | 4体系の統合メソッド | 要件定義書 §4.2 / F3.1観察軸ツリー設計 / 設計中枢 §2.2-2.3 |
 | **観点3** | 診断レポート生成までのワークフロー | 要件定義書 §3.3 / §4.1〜4.3 / §6.4 |
 
@@ -55,5 +55,5 @@ docs/output/help/
 - 要件定義書: [cocosil_v2_detailed_requirements_specification.md](../requirements/cocosil_v2_detailed_requirements_specification.md)
 - F3.1 観察軸ツリー設計: [f3-keyword-tree-integration.md](../goals/f3-keyword-tree-integration.md)
 - 設計中枢: [COCOSiL設計中枢.md](../../input/concepts/COCOSiL設計中枢.md)
-- AIチャット技術スタック議論: [議論ログ_AIチャット技術スタック選定.md](../../discussions/議論ログ_AIチャット技術スタック選定.md)
-- イメージ生成アーキ議論: [議論ログ_imager2アーキ選定.md](../../discussions/議論ログ_imager2アーキ選定.md)
+- AIチャット技術スタック議論: [20260505_議論ログ_AIチャット技術スタック選定.md](../../discussions/20260505_議論ログ_AIチャット技術スタック選定.md)
+- イメージ生成アーキ議論: [20260507_議論ログ_imager2アーキ選定.md](../../discussions/20260507_議論ログ_imager2アーキ選定.md)
