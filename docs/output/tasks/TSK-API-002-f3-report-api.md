@@ -32,7 +32,7 @@ F3統合レポートのバックエンドAPI。Gamma API（月額約2万円）�
 |------|------|---------|
 | F3フィーチャー要件 | [F3_integrated-report_features.md](../F3/F3_integrated-report_features.md) | §1（F3.1 レポート生成エンジン） |
 | 要件定義書 | [cocosil_v2_detailed_requirements_specification.md](../requirements/cocosil_v2_detailed_requirements_specification.md) | §4.3 / §6.4 |
-| 議論ログ | [議論ログ_imager2アーキ選定.md](../../discussions/議論ログ_imager2アーキ選定.md) | 全体 |
+| 議論ログ | [20260507_議論ログ_imager2アーキ選定.md](../../discussions/20260507_議論ログ_imager2アーキ選定.md) | 全体 |
 | 関連プロンプト | [TSK-PROMPT-001](TSK-PROMPT-001-f3-report-prompt.md) | レポート本文プロンプト |
 
 ---

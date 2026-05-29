@@ -33,8 +33,8 @@ related_impl_plan: ""
 |------|------|---------|
 | 要件定義書 | [cocosil_v2_detailed_requirements_specification.md](../requirements/cocosil_v2_detailed_requirements_specification.md) | §3.3 / §4.1〜4.3 / §6.3 / §6.4 / §7.1 |
 | F3.1観察軸設計 | [f3-keyword-tree-integration.md](../goals/f3-keyword-tree-integration.md) | 全体 |
-| 議論ログ | [議論ログ_AIチャット技術スタック選定.md](../../discussions/議論ログ_AIチャット技術スタック選定.md) | 全体 |
-| 議論ログ | [議論ログ_imager2アーキ選定.md](../../discussions/議論ログ_imager2アーキ選定.md) | 全体 |
+| 議論ログ | [20260505_議論ログ_AIチャット技術スタック選定.md](../../discussions/20260505_議論ログ_AIチャット技術スタック選定.md) | 全体 |
+| 議論ログ | [20260507_議論ログ_imager2アーキ選定.md](../../discussions/20260507_議論ログ_imager2アーキ選定.md) | 全体 |
 | 設計中枢 | [COCOSiL設計中枢.md](../../input/concepts/COCOSiL設計中枢.md) | パンチャ構造 §2 |
 
 ---

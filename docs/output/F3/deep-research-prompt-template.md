@@ -16,8 +16,8 @@ related_constitution:
   - lib/constitution/observation-axes.ts
   - lib/constitution/banned-words.ts
 related_discussions:
-  - docs/discussions/議論ログ_F3-1観察軸5軸確定.md
-  - docs/discussions/議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
+  - docs/discussions/20260527_議論ログ_F3-1観察軸5軸確定.md
+  - docs/discussions/20260527_議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md
 related_goals:
   - docs/output/goals/f3-keyword-tree-integration.md
 ---

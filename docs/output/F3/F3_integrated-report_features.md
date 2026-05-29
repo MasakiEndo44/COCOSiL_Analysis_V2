@@ -17,8 +17,8 @@ confidence: high
 presentation_ready: false
 related_grill_session: docs/sandbox/endo/grill-sessions/2026-05-21_cocosil-F-f3-integrated-report.md
 related_discussions:
-  - docs/discussions/議論ログ_安心フェーズ体験設計.md
-  - docs/discussions/議論ログ_imager2アーキ選定.md
+  - docs/discussions/20260503_議論ログ_安心フェーズ体験設計.md
+  - docs/discussions/20260507_議論ログ_imager2アーキ選定.md
 related_requirements:
   - docs/output/requirements/cocosil_v2_system_requirements.md（F3表）
   - docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3
@@ -106,7 +106,7 @@ F3 は非交渉のUXシーケンス「共感 → **安心 → 分析** → 行�
 
 ## 2. F3.2「安心」フェーズ
 
-F3.1レポート生成完了後・表示直前に必ず挿入される、判定不安を和らげる15秒以内の儀式。設計三原則は議論ログ（`議論ログ_安心フェーズ体験設計.md`）で確定済み。
+F3.1レポート生成完了後・表示直前に必ず挿入される、判定不安を和らげる15秒以内の儀式。設計三原則は議論ログ（`20260503_議論ログ_安心フェーズ体験設計.md`）で確定済み。
 
 | 項目 | 内容 |
 |---|---|

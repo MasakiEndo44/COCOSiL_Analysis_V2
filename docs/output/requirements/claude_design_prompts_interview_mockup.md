@@ -10,7 +10,7 @@ proposed_by: endo
 proposed_at: 2026-05-09
 as_of: 2026-05-09
 audience: [designer]
-one_line_thesis: まあみへの引き渡し用。主要5画面のUI静止画モック（モバイル版）をClaude Designで生成するためのプロンプト集。議論ログ（議論ログ_UI静止画モック要件定義.md）を経て確定した3原則に基づく。
+one_line_thesis: まあみへの引き渡し用。主要5画面のUI静止画モック（モバイル版）をClaude Designで生成するためのプロンプト集。議論ログ（20260511_議論ログ_UI静止画モック要件定義.md）を経て確定した3原則に基づく。
 confidence: high
 presentation_ready: false
 ---
@@ -19,7 +19,7 @@ presentation_ready: false
 ## モバイルUIモック（インタビュー用）— まあみへ
 
 > **目的：** 顧客予定者インタビュー用の主要5画面UI静止画モック（モバイル版）をClaude Designで生成する
-> **設計根拠：** `docs/discussions/議論ログ_UI静止画モック要件定義.md`
+> **設計根拠：** `docs/discussions/20260511_議論ログ_UI静止画モック要件定義.md`
 > **要件定義：** `docs/output/requirements/ui_mockup_requirements_interview.md`
 
 ---
@@ -418,7 +418,7 @@ presentation_ready: false
 
 | 日付 | バージョン | 概要 |
 |------|-----------|------|
-| 2026-05-09 | v1.0 | 初版。expert-misaki-discussionによる議論（`docs/discussions/議論ログ_UI静止画モック要件定義.md`）を経て作成。3原則（Emotion-First / Critical-One / Copy-Lock）に基づく5画面プロンプトを定義。 |
+| 2026-05-09 | v1.0 | 初版。expert-misaki-discussionによる議論（`docs/discussions/20260511_議論ログ_UI静止画モック要件定義.md`）を経て作成。3原則（Emotion-First / Critical-One / Copy-Lock）に基づく5画面プロンプトを定義。 |
 
 ---
 

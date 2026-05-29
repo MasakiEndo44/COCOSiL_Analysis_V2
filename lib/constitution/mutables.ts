@@ -1,5 +1,5 @@
 // COCOSiL Constitution: 進化対象（Autogenesis が改善してよいもの）
-// 根拠: AGENTS.md §7 Autogenesis Constitution / docs/discussions/議論ログ_デジタル生命体移行企画.md
+// 根拠: AGENTS.md §7 Autogenesis Constitution / docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md
 
 // Autogenesis が編集を許可されるパスのglobパターン
 export const MUTABLE_PATHS = [
