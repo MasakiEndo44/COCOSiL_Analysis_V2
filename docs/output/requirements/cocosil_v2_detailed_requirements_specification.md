@@ -535,7 +535,7 @@ analytics_events  — PMF KPI計測用イベントログ
 
 ### 6.3 Vercel AI SDK + OpenAI（共感AIチャット・レポート生成）
 
-> **2026-05-05 技術選定確定**：当初「OpenAI Agent Builder」として仮置きしていたが、議論ログ（`docs/discussions/議論ログ_AIチャット技術スタック選定.md`）による検討の結果、**Vercel AI SDK + OpenAI Chat Completions API** に確定。Dify・OpenAI Assistants APIはいずれも不採用（理由は議論ログ参照）。
+> **2026-05-05 技術選定確定**：当初「OpenAI Agent Builder」として仮置きしていたが、議論ログ（`docs/discussions/20260505_議論ログ_AIチャット技術スタック選定.md`）による検討の結果、**Vercel AI SDK + OpenAI Chat Completions API** に確定。Dify・OpenAI Assistants APIはいずれも不採用（理由は議論ログ参照）。
 
 - **用途**: 5フェーズ共感AIチャット、統合レポートコンテンツ生成、シェアカードタイプ名生成
 - **連携方式**: `ai` + `@ai-sdk/openai` パッケージ。`streamText()` + Edge Runtimeでストリーミング応答。APIキーはサーバー専用（`getServerEnv()` 経由）
@@ -547,7 +547,7 @@ analytics_events  — PMF KPI計測用イベントログ
 
 ### 6.4 Vercel OG / gpt-image-2（統合レポート整形）
 
-> **2026-05-07 技術選定確定**：Gamma API（月額約2万円）からの移行を確定。議論根拠: `docs/discussions/議論ログ_imager2アーキ選定.md`
+> **2026-05-07 技術選定確定**：Gamma API（月額約2万円）からの移行を確定。議論根拠: `docs/discussions/20260507_議論ログ_imager2アーキ選定.md`
 
 **フェーズ1〜2: Vercel OG (Satori)**
 
@@ -775,7 +775,7 @@ Supabase（PostgreSQL + RLS）
 | 日付 | バージョン | 概要 | 承認者 |
 |------|-----------|------|--------|
 | 2026-05-03 | v1.0 | COCOSiL V2 詳細要件定義書 初版。V1（v1.3 MVP）デプロイ済みを前提に、設計思想レベルのアップデート（①プロダクト哲学体系化 + ②UXシーケンス絶対化）、5フェーズ共感AIチャット、安心フェーズ（F3.2）、Stripe課金（F7）、データオーナーシップ（F8）を含む60日開発計画 | えんまさ |
-| 2026-05-05 | v1.1 | F4（共感AIチャット）の実装技術をVercel AI SDK (`ai`) + OpenAI Chat Completions APIに確定（§4.4 / §6.3 / §7.1 反映）。Dify・OpenAI Assistants APIは不採用。議論ログ: `docs/discussions/議論ログ_AIチャット技術スタック選定.md` | えんまさ |
+| 2026-05-05 | v1.1 | F4（共感AIチャット）の実装技術をVercel AI SDK (`ai`) + OpenAI Chat Completions APIに確定（§4.4 / §6.3 / §7.1 反映）。Dify・OpenAI Assistants APIは不採用。議論ログ: `docs/discussions/20260505_議論ログ_AIチャット技術スタック選定.md` | えんまさ |
 
 ---
 
@@ -788,7 +788,7 @@ Supabase（PostgreSQL + RLS）
 ### 設計中枢（Layer 0 — 全判断の最上位基準）
 
 - `docs/input/concepts/COCOSiL設計中枢.md` — Why/How/So What 三段論法・設計3原則・5問リトマス試験紙・翻訳テーブル・月次思想ドリフトレビュープロトコル
-- `docs/discussions/議論ログ_設計中枢.md` — 設計中枢構築の議論記録（東洋哲学×ハーバード研究の統合プロセス）
+- `docs/discussions/20260503_議論ログ_設計中枢.md` — 設計中枢構築の議論記録（東洋哲学×ハーバード研究の統合プロセス）
 
 ### 素材（インプット）
 
@@ -802,8 +802,8 @@ Supabase（PostgreSQL + RLS）
 
 ### 議論ログ（expert-misaki-discussion）
 
-- `docs/discussions/議論ログ_安心フェーズ体験設計.md` — F3.2「安心」フェーズ体験設計の議論記録
-- `docs/discussions/議論ログ_決済プロバイダ選定.md` — F7 Stripe選定の議論記録
+- `docs/discussions/20260503_議論ログ_安心フェーズ体験設計.md` — F3.2「安心」フェーズ体験設計の議論記録
+- `docs/discussions/20260503_議論ログ_決済プロバイダ選定.md` — F7 Stripe選定の議論記録
 
 ---
 

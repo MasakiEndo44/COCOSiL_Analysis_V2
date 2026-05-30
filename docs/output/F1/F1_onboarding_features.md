@@ -10,8 +10,8 @@ grill_session: docs/sandbox/endo/grill-sessions/2026-05-21_cocosil-C-f1-onboardi
 related:
   - docs/output/goals/f1-onboarding-registration.md
   - docs/output/requirements/cocosil_v2_detailed_requirements_specification.md
-  - docs/discussions/議論ログ_F1.3ウェルカム対話プロンプト設計.md
-  - docs/discussions/議論ログ_F1要件グリル計画.md
+  - docs/discussions/20260503_議論ログ_F1.3ウェルカム対話プロンプト設計.md
+  - docs/discussions/20260521_議論ログ_F1要件グリル計画.md
 ---
 
 # F1 オンボーディング・登録 — Capability / Feature / Eval 要件
@@ -22,7 +22,7 @@ F1（オンボーディング・登録）の要件を **Capability → Feature �
 
 **スコープ**: F1.1（Clerk認証）・F1.2（生年月日入力）・F1.4（プロダクト哲学提示）の3サブ要件。
 
-- **F1.3（ウェルカム対話）は対象外** — プロンプト本文は `docs/discussions/議論ログ_F1.3ウェルカム対話プロンプト設計.md` で確定済み。
+- **F1.3（ウェルカム対話）は対象外** — プロンプト本文は `docs/discussions/20260503_議論ログ_F1.3ウェルカム対話プロンプト設計.md` で確定済み。
 - 上位の **Vision / Outcome は goal-grill**（`docs/output/goals/f1-onboarding-registration.md`）で確定済み。本書は参照素材として扱う。
 - **S層（実装詳細）は対象外** — コンポーネント構成・ライブラリ選定は TSK-UI-002 / TSK-API-001 に委ねる。
 
@@ -199,8 +199,8 @@ Cookie（消去・別端末で破綻）・専用DBフラグ（認証状態で代
 
 ### 参照
 - グリルセッション: `docs/sandbox/endo/grill-sessions/2026-05-21_cocosil-C-f1-onboarding.md`
-- 計画議論: `docs/discussions/議論ログ_F1要件グリル計画.md`
+- 計画議論: `docs/discussions/20260521_議論ログ_F1要件グリル計画.md`
 - goal-grill: `docs/output/goals/f1-onboarding-registration.md`
 - 詳細要件 §4.1: `docs/output/requirements/cocosil_v2_detailed_requirements_specification.md`
-- F1.3 プロンプト設計: `docs/discussions/議論ログ_F1.3ウェルカム対話プロンプト設計.md`
+- F1.3 プロンプト設計: `docs/discussions/20260503_議論ログ_F1.3ウェルカム対話プロンプト設計.md`
 - 関連タスク: TSK-UI-002（F1ウェルカム対話UI）・TSK-API-001（F1オンボーディングAPI）

@@ -1,5 +1,5 @@
 // COCOSiL Constitution: 絶対不変リスト（Autogenesis が触れてはいけないもの）
-// 根拠: AGENTS.md §7 Autogenesis Constitution / docs/discussions/議論ログ_デジタル生命体移行企画.md
+// 根拠: AGENTS.md §7 Autogenesis Constitution / docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md
 
 export const POLICY_IMMUTABLES = {
   forbidden: [
@@ -24,7 +24,7 @@ export const REFLECTION_METRICS = [
 export const PMF_METRICS = ['session_return_7d_rate'] as const
 export const PMF_THRESHOLD = 0.30 // 7日以内再訪率 30%（PMF成功基準）
 
-// PMF と Reflection の同時測定が必須（議論ログ_設計整合性ハーネス再設計 法則4）
+// PMF と Reflection の同時測定が必須（20260505_議論ログ_設計整合性ハーネス再設計 法則4）
 // 7日再訪率↑ AND 内省スコア↓ = Sycophancy疑惑
 export const SYCOPHANCY_ALERT = {
   description: 'PMF再訪率が高いのに内省スコアが低い場合、Sycophancyの疑い',

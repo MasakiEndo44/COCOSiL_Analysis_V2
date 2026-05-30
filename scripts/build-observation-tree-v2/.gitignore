@@ -1,0 +1,5 @@
+# Pipeline 実行ログ (再現可能なため commit しない)
+logs/
+
+# DRY_RUN モードの生成物 (commit するのは実 LLM 経由で人間レビュー済みのみ)
+outputs/*.json

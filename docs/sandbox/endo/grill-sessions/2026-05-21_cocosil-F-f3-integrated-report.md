@@ -18,8 +18,8 @@ grill_target:
 context_sources:
   - docs/output/requirements/cocosil_v2_system_requirements.md（F3表）
   - docs/output/requirements/cocosil_v2_detailed_requirements_specification.md §4.3
-  - docs/discussions/議論ログ_安心フェーズ体験設計.md（F3.2）
-  - docs/discussions/議論ログ_imager2アーキ選定.md（F3.1）
+  - docs/discussions/20260503_議論ログ_安心フェーズ体験設計.md（F3.2）
+  - docs/discussions/20260507_議論ログ_imager2アーキ選定.md（F3.1）
   - AGENTS.md §0（設計中枢5問）/ §7（Layer分業・Gate 1/2）
 ---
 

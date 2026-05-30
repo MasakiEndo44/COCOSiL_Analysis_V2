@@ -26,7 +26,7 @@
 >
 > Must（Q1〜Q3）が1つでも × の場合、このPRはマージ不可。えんまさに確認してください。
 >
-> 設計根拠: `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則② / `docs/discussions/議論ログ_設計中枢運用落とし穴.md`
+> 設計根拠: `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則② / `docs/discussions/20260503_20260503_議論ログ_設計中枢運用落とし穴.md`
 
 | 問い | レベル | 実装者判定 | レビュアー判定 | 実装者根拠 |
 |---|---|---|---|---|

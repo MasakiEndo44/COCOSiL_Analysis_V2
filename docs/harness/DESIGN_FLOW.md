@@ -211,5 +211,5 @@ AIが以下のPRを自動生成して、えんまさをレビュアーにアサ�
 | [`docs/input/setup/claude_design_prompt_template.md`](../input/setup/claude_design_prompt_template.md) | claude_designに渡すコンテキストテンプレート |
 | [`AGENTS.md` §6](../../AGENTS.md) | 禁止語・代替表現の完全リスト |
 | [`AGENTS.md` §0](../../AGENTS.md) | UXシーケンス（共感→安心→分析→行動）の設計思想 |
-| [`docs/discussions/議論ログ_まあみUIデザインフロー.md`](../discussions/議論ログ_まあみUIデザインフロー.md) | フロー初期設計の議論ログ |
-| [`docs/discussions/議論ログ_一本道フロー設計.md`](../discussions/議論ログ_一本道フロー設計.md) | 一本道化の設計判断ログ |
+| [`docs/discussions/20260503_議論ログ_まあみUIデザインフロー.md`](../discussions/20260503_議論ログ_まあみUIデザインフロー.md) | フロー初期設計の議論ログ |
+| [`docs/discussions/20260503_議論ログ_一本道フロー設計.md`](../discussions/20260503_議論ログ_一本道フロー設計.md) | 一本道化の設計判断ログ |

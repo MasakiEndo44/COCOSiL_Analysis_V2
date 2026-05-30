@@ -1,6 +1,6 @@
 # ハーネス設計見直し提案 v2（2026-05-05）
 
-> 設計根拠: `docs/discussions/議論ログ_AIコーディングリスク評価とハーネス設計.md`
+> 設計根拠: `docs/discussions/20260505_議論ログ_AIコーディングリスク評価とハーネス設計.md`
 > 対象ドキュメント: `AGENTS.md` §7（Protected Areas）
 
 ---

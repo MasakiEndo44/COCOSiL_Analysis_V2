@@ -142,7 +142,7 @@ F3.1 レポート生成エンジンでは、パンチャ構造（色受想行識
 3. **Priority Resolves Crossings.** — 軸間の越境概念（例: 気質）は `layer_priority` で主軸を1つ指定して解決
 
 **設計判断の根拠**:
-- 議論ログ: `docs/discussions/議論ログ_F3-1観察軸5軸確定.md`（仏教学・性格心理学の比較検証）
+- 議論ログ: `docs/discussions/20260527_議論ログ_F3-1観察軸5軸確定.md`（仏教学・性格心理学の比較検証）
 - 上位設計: `docs/output/goals/f3-keyword-tree-integration.md`（Tree of 4, Harvest 1.）
 - ドリフト検知: `lib/constitution/__tests__/drift.test.ts`（CIで本ドキュメントとコードの整合を検証）
 
