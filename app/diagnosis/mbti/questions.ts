@@ -1,4 +1,5 @@
 import type { MbtiQuestion } from "./types";
+export { MBTI_TYPE_DESCRIPTIONS } from "@/app/_data/mbti-descriptions";
 
 /**
  * 12 問の MBTI 簡易診断質問セット
@@ -107,22 +108,3 @@ export const MBTI_TYPES = [
   "ESTJ", "ESFJ", "ENFJ", "ENTJ",
 ] as const;
 
-/** タイプ別の簡易説明 (スキップ時の選択画面用) */
-export const MBTI_TYPE_DESCRIPTIONS: Record<string, { name: string; emoji: string }> = {
-  ISTJ: { name: "管理者", emoji: "📋" },
-  ISFJ: { name: "擁護者", emoji: "🛡️" },
-  INFJ: { name: "提唱者", emoji: "🌟" },
-  INTJ: { name: "建築家", emoji: "🧠" },
-  ISTP: { name: "巨匠", emoji: "🔧" },
-  ISFP: { name: "冒険家", emoji: "🎨" },
-  INFP: { name: "仲介者", emoji: "💭" },
-  INTP: { name: "論理学者", emoji: "🔬" },
-  ESTP: { name: "起業家", emoji: "🚀" },
-  ESFP: { name: "エンターテイナー", emoji: "🎭" },
-  ENFP: { name: "運動家", emoji: "🌈" },
-  ENTP: { name: "討論者", emoji: "⚡" },
-  ESTJ: { name: "幹部", emoji: "👔" },
-  ESFJ: { name: "領事", emoji: "🤝" },
-  ENFJ: { name: "主人公", emoji: "✨" },
-  ENTJ: { name: "指揮官", emoji: "👑" },
-};

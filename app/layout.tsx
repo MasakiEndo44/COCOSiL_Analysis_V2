@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "COCOSiL",
-  description: "MBTI × 星座 × 動物占い × 六星占術 の統合性格分析 ＋ 共感AIチャット",
+  description: "MBTI × 12星座 × 60アニマル診断 × 六星占術 の統合性格分析 ＋ 共感AIチャット",
 };
 
 export default function RootLayout({
@@ -25,11 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html
-        lang="ja"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col">{children}</body>
+      <html lang="ja" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body>{children}</body>
       </html>
     </ClerkProvider>
   );

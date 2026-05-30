@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json<AutoCalcResponse>(
-      { success: false, error: parsed.error.issues[0]?.message ?? '不正なリクエストです' },
+      { success: false, error: '不正なリクエストです' },
       { status: 400 },
     );
   }

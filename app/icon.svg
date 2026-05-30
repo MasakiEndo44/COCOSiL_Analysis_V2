@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#93c5fd"/>
+      <stop offset="40%"  stop-color="#a78bfa"/>
+      <stop offset="70%"  stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+  </defs>
+  <!-- ハート形: ローポリ風ジオメトリック -->
+  <path d="
+    M50 85
+    L15 52
+    L18 30
+    L35 20
+    L50 28
+    L65 20
+    L82 30
+    L85 52
+    Z
+  " fill="url(#heartGrad)"/>
+  <!-- 内側のファセット -->
+  <path d="M50 28 L35 20 L18 30 L30 45 Z" fill="rgba(255,255,255,0.15)"/>
+  <path d="M50 28 L65 20 L82 30 L70 45 Z" fill="rgba(255,255,255,0.08)"/>
+  <path d="M50 28 L30 45 L50 55 L70 45 Z" fill="rgba(255,255,255,0.12)"/>
+  <path d="M30 45 L15 52 L50 85 L50 55 Z" fill="rgba(0,0,0,0.08)"/>
+  <path d="M70 45 L85 52 L50 85 L50 55 Z" fill="rgba(0,0,0,0.15)"/>
+</svg>

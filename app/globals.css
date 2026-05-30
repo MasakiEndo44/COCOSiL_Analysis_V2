@@ -8,16 +8,21 @@
 }
 
 :root {
-  --background: #0f0f1a;
-  --foreground: #e8e8f0;
-  --card-bg: #1a1a2e;
-  --card-border: #2a2a4a;
+  --background: #faf9ff;
+  --foreground: #1e1a3c;
+  --card-bg: #ffffff;
+  --card-border: #ede9f8;
   --accent-primary: #7c5cfc;
-  --accent-secondary: #a855f7;
-  --accent-glow: rgba(124, 92, 252, 0.3);
-  --text-muted: #8888a8;
-  --success: #34d399;
-  --surface: #16162a;
+  --accent-secondary: #a78bfa;
+  --accent-glow: rgba(124, 92, 252, 0.2);
+  --text-muted: #7b7b9d;
+  --success: #22c55e;
+  --surface: #f5f3ff;
+}
+
+/* スクロールバー色をCSS変数で制御（透明化によるアニメーション中の非表示） */
+:root {
+  --scrollbar-color: auto;
 }
 
 body {
@@ -25,6 +30,119 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans, "Inter", "Hiragino Kaku Gothic ProN", sans-serif);
   -webkit-font-smoothing: antialiased;
+  /* スクロールバーの有無で幅が変わらないようにガターを常時確保 */
+  scrollbar-gutter: stable;
+}
+
+/* Chromium系: スクロールバー色を変数で切り替え */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-color, rgba(124,92,252,0.2));
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+/* Firefox */
+* { scrollbar-color: var(--scrollbar-color, rgba(124,92,252,0.2) transparent); scrollbar-width: thin; }
+
+/* ================================================
+   ボタン押下エフェクト
+   .btn-press → タップ/クリック時に明度を落とし、離したら戻る
+   ================================================ */
+.btn-press {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.btn-press:active:not(:disabled) {
+  opacity: 0.55;
+  transform: scale(0.97);
+}
+
+/* カード型ボタン（know-check など）— 押し込み感 */
+.btn-card-press {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.btn-card-press:active:not(:disabled) {
+  opacity: 0.7;
+  transform: scale(0.985);
+}
+
+/* ================================================
+   PC レスポンシブ: コンテンツ中央カラム
+   .content-col → コンテンツを中央 680px に収める内側ラッパー
+   スマホ(< 640px)は何も変わらない
+   ================================================ */
+@media (min-width: 640px) {
+  .content-col {
+    max-width: 680px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+  }
+}
+
+/* ================================================
+   オーロラ背景 — 全ページ共通の動くグラデーション
+   ================================================ */
+.bg-aurora {
+  position: relative;
+  background: #faf9ff;
+  overflow: hidden;
+}
+.bg-aurora::before,
+.bg-aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(72px);
+  opacity: 0;
+  animation: aurora-fade-in 1.2s ease 0.1s forwards;
+}
+/* 右上: 紫〜ローズ */
+.bg-aurora::before {
+  width: 65vw;
+  height: 65vw;
+  max-width: 520px;
+  max-height: 520px;
+  top: -18%;
+  right: -18%;
+  background: radial-gradient(circle at 40% 40%,
+    rgba(167,139,250,0.55) 0%,
+    rgba(232,121,249,0.32) 40%,
+    rgba(167,139,250,0) 72%
+  );
+  animation: aurora-fade-in 1.2s ease 0.1s forwards, aurora-drift-a 14s ease-in-out 1.3s infinite;
+}
+/* 左下: ラベンダー〜スカイ */
+.bg-aurora::after {
+  width: 55vw;
+  height: 55vw;
+  max-width: 440px;
+  max-height: 440px;
+  bottom: -12%;
+  left: -14%;
+  background: radial-gradient(circle at 60% 60%,
+    rgba(196,181,253,0.50) 0%,
+    rgba(96,165,250,0.22) 45%,
+    rgba(196,181,253,0) 72%
+  );
+  animation: aurora-fade-in 1.4s ease 0.3s forwards, aurora-drift-b 18s ease-in-out 1.5s infinite;
+}
+
+@keyframes aurora-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes aurora-drift-a {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  35%      { transform: translate(-5%, 6%) scale(1.08); }
+  68%      { transform: translate(4%, -4%) scale(0.95); }
+}
+@keyframes aurora-drift-b {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(6%, -5%) scale(1.06); }
+  72%      { transform: translate(-3%, 4%) scale(0.97); }
 }
 
 /* ================================================
@@ -38,12 +156,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     padding: 2rem 1rem 4rem;
-    background: linear-gradient(
-      170deg,
-      var(--background) 0%,
-      #12122a 40%,
-      #1a1038 100%
-    );
+    background: var(--background);
   }
 
   .mbti-page {
@@ -512,6 +625,63 @@ body {
   }
 }
 
+/* ================================================
+   MBTI Result — ファーストビュー / 詳細パネル
+   ================================================ */
+/* ダイヤ型キラキラ: 0→拡大→急消え */
+@keyframes mbti-sparkle {
+  0%   { opacity: 0;   transform: scale(0);   }
+  25%  { opacity: 1;   transform: scale(1);   }
+  65%  { opacity: 0.9; transform: scale(1.2); }
+  100% { opacity: 0;   transform: scale(0.1); }
+}
+@keyframes mbti-fadein {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mbti-scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50%       { transform: translateY(8px); opacity: 0.35; }
+}
+
+.mbti-fi-badge  { animation: mbti-fadein 0.6s ease 0.1s  both; }
+.mbti-fi-title  { animation: mbti-fadein 0.6s ease 0.35s both; }
+.mbti-fi-sub    { animation: mbti-fadein 0.6s ease 0.55s both; }
+.mbti-fi-btn    { animation: mbti-fadein 0.6s ease 0.85s both; }
+.mbti-scroll-ch1 { animation: mbti-scroll-bounce 1.5s ease-in-out           infinite; }
+.mbti-scroll-ch2 { animation: mbti-scroll-bounce 1.5s ease-in-out 0.28s    infinite; }
+
+/* ファーストビューパネル: revealed で上へスライドアウト */
+.mbti-panel-first {
+  position: fixed; inset: 0; z-index: 200;
+  background: #faf9ff;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem 1.25rem;
+  overflow: hidden;
+  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(0);
+}
+.mbti-panel-first.revealed {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* 詳細パネル: revealed で下から上へスライドイン */
+.mbti-panel-detail {
+  position: fixed; inset: 0; z-index: 100;
+  background: #faf9ff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  transform: translateY(100%);
+}
+.mbti-panel-detail.revealed {
+  transform: translateY(0);
+  overflow-y: auto;
+}
+
+
 /* Keyframes must be outside @layer */
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(40px); }
@@ -526,4 +696,25 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* MBTI 戻る/進むボタン — スマホはfloating、PCはサイド */
+/* デフォルト(スマホ): floatingを表示、sideを非表示 */
+.mbti-back-float { display: flex; }
+.mbti-back-side { display: none; }
+
+/* 640px以上: floatingを非表示、sideを表示 */
+@media (min-width: 640px) {
+  .mbti-back-float { display: none !important; }
+  .mbti-back-side { display: flex !important; }
+}
+
+/* PC サイドナビボタン — hover スタイルを CSS で管理（inline残存バグ防止） */
+.mbti-nav-btn {
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.mbti-nav-btn:hover {
+  color: #7c5cfc !important;
+  border-color: #7c5cfc !important;
+  box-shadow: 0 4px 16px rgba(124,92,252,0.25) !important;
 }
