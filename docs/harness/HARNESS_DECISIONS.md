@@ -6,7 +6,7 @@
 |---|---|
 | 最終更新 | 2026-05-04 |
 | 対応バージョン | Phase 2 + Phase 3 + Phase 4-pre（TDDベストプラクティス適用版） |
-| 関連ドキュメント | `AGENTS.md` §7, `.claude/skills/cocosil-domain/SKILL.md`, `docs/discussions/議論ログ_ハーネス導入.md`, `docs/discussions/議論ログ_アトミック確認ループ設計.md`, `docs/discussions/議論ログ_TDDベストプラクティス適用.md` |
+| 関連ドキュメント | `AGENTS.md` §7, `.claude/skills/cocosil-domain/SKILL.md`, `docs/discussions/20260502_議論ログ_ハーネス導入.md`, `docs/discussions/20260504_議論ログ_アトミック確認ループ設計.md`, `docs/discussions/20260504_議論ログ_TDDベストプラクティス適用.md` |
 
 ---
 
@@ -120,7 +120,7 @@ Layer 3 ── 開発層（壊れても Git revert で修復可能）
 
 ## 6. Bootstrapping Governance — Admin bypassの設計的位置づけ
 
-議論ログ `議論ログ_PRレビュー問題.md` の Turn 4〜5 に基づく判断。
+議論ログ `20260502_議論ログ_PRレビュー問題.md` の Turn 4〜5 に基づく判断。
 
 ### 問題の構造（Self-Blocking Anti-Pattern）
 
@@ -221,14 +221,14 @@ GitHubのAudit Logで追跡可能にすることで「緊急例外」を「設�
 
 ### 参照ドキュメント
 
-- 議論ログ（詳細）: `docs/discussions/議論ログ_アトミック確認ループ設計.md`
+- 議論ログ（詳細）: `docs/discussions/20260504_議論ログ_アトミック確認ループ設計.md`
 - Gap 管理: `docs/harness/HARNESS_HEALTH.md` §G9
 
 ---
 
 ## 6c. TDDベストプラクティス適用方針（2026-05-04）
 
-> 参照: `docs/discussions/議論ログ_TDDベストプラクティス適用.md`
+> 参照: `docs/discussions/20260504_議論ログ_TDDベストプラクティス適用.md`
 > 参照レポート: エンタープライズAIエージェントTDDベストプラクティス（Stripe/Shopify/Vercel/GitHub事例 2022–2025）
 
 ### COCOSiL V2向け設計3原則
@@ -375,6 +375,6 @@ COCOSiL V2は現在「静的な性格分析Webアプリ」として初期実装�
 
 ### 参照ドキュメント
 
-- 議論ログ（詳細）: `docs/discussions/議論ログ_デジタル生命体移行企画.md`
+- 議論ログ（詳細）: `docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md`
 - AGENTS.md §7 Autogenesis Constitution（ルール定義の正）
 - HARNESS_HEALTH.md §G10（Phase A Gap管理）

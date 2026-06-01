@@ -42,7 +42,7 @@ grill_target:
 
 ## Open Questions
 
-<!-- 計18問。議論ログ_F1要件グリル計画.md で取捨選択・進行計画を確定 -->
+<!-- 計18問。20260521_議論ログ_F1要件グリル計画.md で取捨選択・進行計画を確定 -->
 
 ### C 層（Capability・3問）
 - [C-1] F1が満たすべきCapabilityを3つに分解すると？
@@ -232,7 +232,7 @@ grill_target:
 
 ## Notes
 
-- グリル進行計画（議論ログ_F1要件グリル計画.md 由来）:
+- グリル進行計画（20260521_議論ログ_F1要件グリル計画.md 由来）:
   - 設計3原則: ① Bind, Don't Reinvent.（既出は[A]/[I]で引用・再質問しない）② Grill Where Decisions Are Dense.（未決×高影響に集中）③ Stop at Feature, Leave Spec to Tasks.（S層に降りない）
   - 取捨選択の軸: 決定の自由度（既出⇔未決）× ユーザー摩擦影響度（低⇔高）の4象限
   - 🔴必須グリル: 生年月日UI方式・認証画面統合方式・画面遷移シーケンス・プライバシー提示
@@ -240,5 +240,5 @@ grill_target:
   - 🟢省略: パスワードポリシー（Clerkデフォルト委譲）・哲学コピー本文（language-design別タスク）・認証失敗エラーコピー本文（§4.1既出）
   - EARS対象: 生年月日バリデーション3本＋認証失敗1本のみ。哲学・SNSはUbiquitous記法1行
   - S層は対象外。実装詳細は TSK-UI-002 / TSK-API-001 に委譲
-- 参照素材: docs/output/goals/f1-onboarding-registration.md / §4.1（cocosil_v2_detailed_requirements_specification.md）/ 議論ログ_F1.3ウェルカム対話プロンプト設計.md
+- 参照素材: docs/output/goals/f1-onboarding-registration.md / §4.1（cocosil_v2_detailed_requirements_specification.md）/ 20260503_議論ログ_F1.3ウェルカム対話プロンプト設計.md
 - spec-sync 実施済み（2026-05-21）: D4 → §4.1 例外系を「スキップ不可・必須」に改訂 ／ C1 → goal-grill のファネル・測定方法を更新

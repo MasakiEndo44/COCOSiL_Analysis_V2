@@ -7,7 +7,7 @@ description: >
   Use when: "Issue生成" "TSKを作って" "チケット起票" "タスクドキュメントを作って"
   "TSK-**のIssueを作って" "未着手タスクを全部起票" "--all"
   設計原則: Context-Complete Generation / Read Before Write / Atomic Update
-  設計根拠: docs/discussions/議論ログ_タスクIssue自動生成スキル設計.md
+  設計根拠: docs/discussions/20260507_議論ログ_タスクIssue自動生成スキル設計.md
 ---
 
 # task-issue-generator Skill
@@ -298,4 +298,4 @@ Gate: <Gate 1 / Gate 2 の必要性>
 | `docs/TASK-INDEX.md` | 全タスクのマスター管理ファイル |
 | `docs/output/tasks/_TEMPLATE.md` | TSKファイルのテンプレート |
 | `docs/output/requirements/cocosil_v2_detailed_requirements_specification.md` | 参照元の要件定義書 |
-| `docs/discussions/議論ログ_タスクIssue自動生成スキル設計.md` | このスキルの設計根拠 |
+| `docs/discussions/20260507_議論ログ_タスクIssue自動生成スキル設計.md` | このスキルの設計根拠 |

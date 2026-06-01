@@ -83,7 +83,7 @@ COCOSiLは「現代の無明（むみょう）」を解消するために存在�
 ## 3. 技術スタック & SOP
 
 - **スタック:** Next.js 16（App Router必須）, Supabase, Clerk（認証）, OpenAI（F3 共感AIチャット）, Vercel OG / gpt-image-2（F3 統合レポート生成）, Vercel, Tailwind CSS 4, TypeScript 5。
-- **Vercel OG / gpt-image-2注意：** F3（統合レポート）の主要依存。フェーズ1〜2は `@vercel/og`（Satori）で文字崩れゼロ・即時生成。フェーズ3以降でgpt-image-2（OpenAI）を背景/アイコン専用として追加。Gamma APIからの移行確定（2026-05-07）。設計根拠: `docs/discussions/議論ログ_imager2アーキ選定.md`
+- **Vercel OG / gpt-image-2注意：** F3（統合レポート）の主要依存。フェーズ1〜2は `@vercel/og`（Satori）で文字崩れゼロ・即時生成。フェーズ3以降でgpt-image-2（OpenAI）を背景/アイコン専用として追加。Gamma APIからの移行確定（2026-05-07）。設計根拠: `docs/discussions/20260507_議論ログ_imager2アーキ選定.md`
 - **実行環境:** Unixベース環境（Mac または WSL2）のみ。
 - **環境変数:** `.env.local` で管理。リポジトリには絶対にコミットしない。アプリケーションコード内では `@/lib/env` 経由でのみ読む。`process.env` の直接参照禁止。
 
@@ -98,6 +98,7 @@ COCOSiLは「現代の無明（むみょう）」を解消するために存在�
 - **`src/` ディレクトリは存在しない:** パスエイリアス `@/*` は `./*`（プロジェクトルート）にマップされる。ファイルは `app/`・`lib/`・`public/` 直下に置く。`src/app/` や `src/lib/` は存在しない。
 - **環境変数の読み方:** `@/lib/env` の `env`（クライアント用）または `getServerEnv()`（サーバー用）を使う。アプリケーションコードで `process.env.XXX` を直接読まない。
 - **Supabase型定義:** `pnpm db:types` で生成する（リモートプロジェクト接続）。手書き禁止。
+- **DBスキーマ変更:** テーブル追加・カラム変更・RLS変更など DB スキーマの更新が必要な場合は、必ず `supabase/migrations/` に差分マイグレーションファイル（例: `20260601000000_add_xxx.sql`）を追加する。`supabase/migrations/**` は Layer 1 保護対象のため、`supabase migration repair` や `supabase db reset` は人間が手動実行する（hookでブロック）。
 - **Zodのimport:** `zod/v4` サブパスを使う: `import { z } from 'zod/v4'`。
 - **Supabase MCP:** `.mcp.json` でプロジェクト共有設定済み。使用にはシェル環境変数 `SUPABASE_ACCESS_TOKEN` が必要（`~/.zshrc` に `export SUPABASE_ACCESS_TOKEN=sbp_...` を追記）。トークンは https://supabase.com/dashboard/account/tokens から取得。
 
@@ -181,7 +182,7 @@ Gate 2 **対象外**（えんまさ承認不要）: スタイリングのみ変�
 
 ### テスト分類学（COCOSiL V2版）
 
-> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §6c / `docs/discussions/議論ログ_TDDベストプラクティス適用.md`
+> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §6c / `docs/discussions/20260504_議論ログ_TDDベストプラクティス適用.md`
 
 | レイヤー | 対象 | ツール | タイミング |
 |---|---|---|---|
@@ -202,7 +203,7 @@ expect(prompt).toContain("共感")       // 共感フェーズ必須キーワー
 
 ### 機能完了の定義（アトミック確認ループ）
 
-> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §6b / `docs/discussions/議論ログ_アトミック確認ループ設計.md`
+> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §6b / `docs/discussions/20260504_議論ログ_アトミック確認ループ設計.md`
 
 **機能完了 = 型チェック通過（機械）＋ ビルド成功（機械）＋ 動作確認済み（えんまさ）**
 
@@ -233,7 +234,7 @@ expect(prompt).toContain("共感")       // 共感フェーズ必須キーワー
 
 ### Autogenesis Constitution（自己進化の操作境界）
 
-> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §8 / `docs/discussions/議論ログ_デジタル生命体移行企画.md`
+> 設計根拠: `docs/harness/HARNESS_DECISIONS.md` §8 / `docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md`
 
 COCOSiL V2はPhase A→B→Cの段階的移行により「デジタル生命体（Audit-Gated Self-Evolving System）」を目指す。
 AIエージェントはAutogenesisの操作境界を厳守する。
@@ -263,7 +264,7 @@ AIエージェントはAutogenesisの操作境界を厳守する。
 
 #### Constitution as Code（単一の真実）
 
-> 設計根拠: `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則① / `docs/discussions/議論ログ_設計整合性ハーネス再設計.md`
+> 設計根拠: `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則① / `docs/discussions/20260505_議論ログ_設計整合性ハーネス再設計.md`
 
 Autogenesis Constitution（絶対不変リスト・Mutableリスト）と言語設計（禁止語彙）の **正は `lib/constitution/`** とする。本文書（AGENTS.md）・`docs/input/concepts/COCOSiL設計中枢.md`・`docs/input/concepts/language-design-v1.md`・`.claude/skills/cocosil-domain/SKILL.md` は解説（コメンタリー）として位置づけ、ドリフト時はコードを正とする。
 

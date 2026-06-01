@@ -26,9 +26,11 @@ one_line_thesis: F3「統合レポート」5サブフィーチャー（F3.1〜F3
 
 F3「統合レポート」は、COCOSiL V2の全体体験において「安心 → 分析」フェーズを担う中核フィーチャー群である。F2で収集した4体系診断データ（星座・動物性格診断・六星占術・MBTI）をAIが統合し、東洋哲学のパンチャ構造（4+1=5）に基づいた「1つの立体的な自己像（識）」をユーザーに届ける。バラバラの「ラベル集」ではなく、「なぜ自分はこうなのか」が構造として腑落ちする体験の生成が目的である。
 
-技術実装は3層で構成される。**生成層**：OpenAI（GPT-4o系）が4体系を統合したレポートコンテンツをLLMで生成する。**整形層**：Vercel OG（Satori）がサーバーサイドで縦長（1024×1792）の構造化レポートを即時生成し文字崩れゼロを保証する。Phase 3以降でgpt-image-2（OpenAI）を背景・アイコン専用として追加する。**体験層**：レポート表示直前に「安心（F3.2）」フェーズを必ず挿入し、「結果＝評価」から「結果＝地図」への認知転換を保証する。
+技術実装は **4 層** で構成される。**統合層（v1.2 追加）**：`lib/diagnostics/integration/` の純関数群（`harvest()` / `computeAxisAffinity()` / `computeLayer1Distribution()`）が 4 体系診断データを決定論的に 5 軸スコア + 識メタ層 + Trunks + Layer 1 確率分布へと変換する。LLM を使わず Constitution-as-Code（`HYBRID_DISTANCE_ALPHA` / `LAYER2_TO_LAYER1` / `LAYER3_TO_LAYER1_MODULATION`）に従って計算する。**生成層**：OpenAI（GPT-4o系）が統合層の `HarvestResult` を context として受け取り、4 体系を統合したレポートコンテンツを Anatta-Aware Output 構文（断定構文禁止）で生成する。**整形層**：Vercel OG（Satori）がサーバーサイドで縦長（1024×1792）の構造化レポートを即時生成し文字崩れゼロを保証する。Phase 3 以降で gpt-image-2（OpenAI）を背景・アイコン専用として追加する。**体験層**：レポート表示直前に「安心（F3.2）」フェーズを必ず挿入し、「結果＝評価」から「結果＝地図」への認知転換を保証する。
 
 5サブフィーチャーはPhase 1（F3.1〜F3.4：初回体験MVP）とPhase 3（F3.5：継続課金体験）に段階分割して実装する。
+
+> **v1.2 アーキテクチャ変更**: 統合層の追加は PR#66（`docs/output/decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md`）の「Tree of 4, Harvest 1.」設計 3 原則 — ① Profiles over Cells. / ② Geometric Fusion, LLM Narration. / ③ Anatta-Aware Output. — を実装したもの。詳細仕様は §4.1A（統合アルゴリズム）+ §4.1B（言語設計）参照。設計判断履歴は Stage 1 D11〜D13。
 
 ---
 
@@ -160,6 +162,138 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - **モデレーションルール（D8）**：`lib/constitution/` 配下に `name-moderation.ts` を新設しConstitution化。CIで `display_name` バリデーションテストを実行
 - **OG文字数clamp（D8）**：Vercel OG描画コンポーネント内で20文字超を機械的に省略（ユニットテスト必須）
 - **60type化（D10）**：F3.1のプロンプトは 60type の `character` ラベルを参照する形に書き換え（Gate 2対象）。**TSK-DATA-XXX（60typeレポート用詳細説明文整備）の完了を前提とする**。未完了時は `character` ラベルのみのフォールバックプロンプトを使用
+
+---
+
+### 4.1A F3.1 統合アルゴリズム仕様（v1.2 追加・ヒラメ向け詳細）
+
+> 本サブセクションは Stage 1 F3.1.11〜F3.1.13 / F3.1.15 の **How** を記述する。実装担当（ヒラメ）が読むことを想定。Stage 1 D11 / D12 / D13 の **Why** と対になる。読者: えんまさ / まあみは §4.1 本文 + §4.1B のみ読めば足りる。
+
+**対応 Stage 1 要件**: F3.1.11（Trunks→Harvest 接続・🔴）/ F3.1.12（5 軸スコア表示・🟡）/ F3.1.13（Layer 1 分布可視化・🟢）/ F3.1.15（Layer 3 Modulator・🟡）
+
+#### A.1 統合層の責務
+
+`lib/diagnostics/integration/` の純関数群が以下を保証する：
+
+| 責務 | 保証内容 |
+|---|---|
+| 入力 | `UserDiagnosticInput = { birthDate: Date; mbti: MbtiType; phase?: Layer3Phase }` |
+| 出力 | `HarvestResult = { axisScores; meta; trunks; layer1Distribution }` |
+| 純関数性 | LLM 不使用、同一入力 → 同一出力（B-3 防止） |
+| 構成 | `types.ts` / `trunks.ts` / `probability.ts` / `hybrid-distance.ts` / `harvest.ts` / `index.ts` |
+| 検証 | 単体テスト 47 件（境界ケース / Σ=1.00 保存則 / α 階層性 / 再現性 ×10 / 禁止語混入ゼロ） |
+
+#### A.2 業務フロー（統合層内部）
+
+1. **Trunks 解決** — `resolveFourSystemTrunks(input)`
+   - 生年月日 → 動物 60type ID → `baseAnimal` → `Layer2AnimalStyle`（sun/earthMode/fullMoon/newMoon）
+   - 生年月日 → サイン名 → `Layer1Element`（fire/earth/air/water）
+   - 生年月日 → 六星人タイプ → `RokuseiPolarity`（+/-）
+   - MBTI 4 文字 → `Layer2KeirseyStyle`（nt/nf/sj/sp）
+2. **Layer 1 確率分布計算** — `computeLayer1Distribution(trunks, phase)`
+   - 4 体系の Layer 1 分布を等加重平均 → `applyPhaseModulationToLayer1` で変調 → Σ=1.00 再正規化
+3. **5 軸 Hybrid Distance 計算** — `computeAxisAffinity(trunks, axis, layer)` × 5 軸 × 2-3 階層
+   - α は `HYBRID_DISTANCE_ALPHA` から取得（layer1=0.7 / layer2=0.5 中間点 / layer3=0.3）
+   - Rule 部: 軸の `observation_keywords` と Trunks 対応 vocab の substring 一致率
+   - Embedding 部: 現フェーズは 0.5 stub（v3 で OpenAI text-embedding-3-small 導入予定）
+4. **5 軸スコア集約** — 各軸で Layer 1→2 / Layer 2→3 の hybrid 平均を [0,1] にクリップ
+5. **識メタ層生成** — `generateMeta(scores)`
+   - 5 軸スコアの分布に応じて branching で文型を選択（固定テンプレートではない）
+   - 出力例: 「動機エネルギーが際立って前面に出る輪郭。認知スタイルが補助線として支える構成。」
+
+#### A.3 F3.1 レポート生成 API との接続契約
+
+```
+POST /api/reports/generate
+  Body: { mbti, birthDate, phase?, displayName }
+    ↓
+  [Step 1] Clerk JWT → supabase.auth.getUser() → user_id
+  [Step 2] Zod 検証（UserDiagnosticInputSchema 含む）
+  [Step 3] resolveFourSystemTrunks(input) → trunks
+  [Step 4] harvest(input) → HarvestResult
+  [Step 5] OpenAI API（30秒タイムアウト）に HarvestResult を context 注入
+            プロンプト構造:
+              - displayName（D8）
+              - trunks（4 体系 ID + Trunks 表象）
+              - axisScores（5 軸プロファイル）
+              - meta（識の名詞化要約）
+              - layer1Distribution（4 元素確率）
+              - phase（Layer 3、optional）
+  [Step 6] Vercel OG → Supabase Storage 保存（既存フロー）
+```
+
+#### A.4 例外系（統合層）
+
+| 状況 | 挙動 |
+|---|---|
+| `harvest()` が throw（例: 未知の baseAnimal）| API 500 でフレンドリーエラー。`/api/reports/generate` 側で `try/catch` してリトライ |
+| Σ=1.00 を満たさない分布が computed（保証違反）| Zod スキーマで弾く。要件書側はこの状況を「コードバグ」と分類 |
+| Layer 3 phase が未指定 | 変調なし。`harvest()` は phase=undefined を受容する（要件: optional） |
+
+#### A.5 特殊要件
+
+- **Constitution-as-Code 厳守**: 要件書には数値（α=0.7 等）を直接書かず `HYBRID_DISTANCE_ALPHA.layer1ToLayer2` 等のシンボル参照のみ（D13）
+- **drift test 必須**: `lib/constitution/__tests__/drift.test.ts` で要件書 / AGENTS.md とコードの照合を CI 実行
+- **再現性テスト**: 同一 input × 10 回で `HarvestResult.axisScores` / `.meta` が完全一致を Vitest で強制
+- **Embedding v3 移行時**: `computeEmbeddingScore` の stub（=0.5）を OpenAI text-embedding-3-small に置換。要件書 v1.3 で改訂
+
+---
+
+### 4.1B F3.1 言語設計 — Anatta-Aware Output（v1.2 追加・えんまさ向け詳細）
+
+> 本サブセクションは Stage 1 F3.1.14 の **How** を記述する。意味設計担当（えんまさ）が読むことを想定。**Gate 2 必須**。
+
+**対応 Stage 1 要件**: F3.1.14（Anatta-Aware Output 構文ガード・🔴）
+
+#### B.1 設計原則
+
+PR#66 b3391ce 設計 3 原則の ③ **Anatta-Aware Output** を Constitution-as-Code 化する。仏教の「無我（anattā）」概念に基づき、性格を固定的実体（「あなたは〇〇です」）として断定する表現を全プロンプトから排除する。
+
+#### B.2 禁止構文（機械検出）
+
+`lib/constitution/banned-output-patterns.ts`（Phase 1 内に新設）に以下を定義：
+
+```typescript
+// 数値・正規表現は Constitution が単一の真実。要件書はシンボル参照のみ。
+export const BANNED_OUTPUT_PATTERNS = [
+  /あなたは(.{1,30})です/,        // 自己断定
+  /あなたは(.{1,30})タイプです/,   // タイプ断定
+  /あなたは(.{1,30})である/,       // 古典的断定
+  /必ず(.{1,30})する/,            // 不可逆断定
+  /絶対に(.{1,30})/,              // 強制断定
+] as const
+```
+
+#### B.3 推奨構文（プロンプト設計の正解集合）
+
+| 文型カテゴリ | 推奨例 | 哲学的根拠 |
+|---|---|---|
+| 状況依存的傾向表現 | 「〇〇な傾向」「〇〇しがちな〜」 | 縁起的（状況に応じて顕現） |
+| 文脈固有表現 | 「特に〇〇な状況で」「〇〇の場面で」 | 縁起の限定条件を明示 |
+| 名詞化止め（識メタ用） | 「〜輪郭」「〜構成」「〜佇まい」 | 主語の固定を回避 |
+| 関係性表現 | 「〇〇さんと話すとき〜になりやすい」 | 関係性の中で顕現する自己 |
+| 時間限定表現 | 「いまの自分は〜」「夏のあなたは〜」 | 時期変調を許容 |
+
+#### B.4 業務フロー（v1.2 の CI ガード）
+
+1. プロンプトテンプレート（`lib/prompts/report/*.ts`）の全文字列を CI で正規表現スキャン
+2. 違反検出時は CI 失敗、PR をブロック
+3. レポート生成サンプル（Vercel preview deploy で 5 件生成）を `runDeterministicChecks` 相当の検証 step に通す（Phase 1.5 で追加）
+4. えんまさ Gate 2 レビューで主観テスト（「あなたは ESFP の女性で」のような違反パターンが透けて出ていないか）
+
+#### B.5 例外系
+
+| 状況 | 挙動 |
+|---|---|
+| ユーザーが MBTI 解説の文脈で「ENFP タイプとは」と書く（一般論として） | 主語が「あなた」でない場合は許容。正規表現は `/あなたは...タイプです/` のみマッチ |
+| F3.2 安心サブテキストで「あなたは大丈夫です」相当の表現を入れたい | フォールバック構文（えんまさ事前設計、`reassurance-subtext.ts` に格納）。安心系定型句は許容（議論ログで個別 case-by-case） |
+| 自由記述（F3.4 アンケート）でユーザーが「あなたは〇〇です」と書く | 入力検証では弾かない（言論の自由） |
+
+#### B.6 特殊要件
+
+- **Gate 2 必須**: B.2 / B.3 の追加・変更は全てえんまさ承認。`lib/constitution/banned-output-patterns.ts` の変更は Layer 2（意味設計）扱い
+- **言語設計ガイド更新**: `language-design` スキル（`.claude/skills/language-design/`）に B.3 推奨構文を反映
+- **メトリクス**: F9.3 KPI ダッシュボードで「断定構文検出率」を計測（目標 0%、Phase 2 以降の運用監視項目）
 
 ---
 
@@ -401,6 +535,26 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - **連携方式**: `auth()` を API Route Handler内で直接呼び出し。Server Actions経由不使用（AGENTS.md §1厳格ルール）
 - **認証フロー**: Clerk JWT → `supabase.auth.getUser()` → `user_id` 取得 → RLS適用
 
+### 6.X lib/diagnostics/integration/（v1.2 追加・F3.1 統合層）
+
+- **用途**: F3.1 レポート生成 API が `harvest()` を呼び 4 体系 → `HarvestResult` の決定論変換を行う
+- **連携方式**: 同一プロセス内 TypeScript モジュールの関数呼び出し（外部 API なし）
+- **入出力契約**: `lib/diagnostics/integration/types.ts` の Zod スキーマ
+- **依存**: `lib/constitution/three-layer-model.ts` / `lib/constitution/observation-axes.ts` / `lib/data/three-layer-vocab/twigs/`
+- **LLM 使用**: なし（B-3 防止のため決定論純関数）
+- **想定コスト**: ¥0（純 TypeScript 計算、Next.js ランタイム内）
+- **詳細仕様**: §4.1A 参照
+
+### 6.Y scripts/build-observation-tree-v2/（v1.2 追加・ビルド時パイプライン）
+
+- **用途**: 4 体系 × 5 軸の観察軸ツリーデータを Vercel AI Gateway 経由で生成（ランタイム稼働ではなくビルド時のデータ整備ツール）
+- **連携方式**: CLI（`pnpm build:observation-tree-v2 --system X --axis Y`）
+- **認証方式**: VERCEL_OIDC_TOKEN または AI_GATEWAY_API_KEY
+- **モデル**: anthropic/claude-haiku-4-5（Vercel AI Gateway 経由）
+- **DRY_RUN モード**: CI / オフライン検証では LLM を呼ばずモック JSON で構造検証
+- **想定コスト**: 初回 4 × 5 = 20 セル生成で Haiku 4.5 概算 $0.5〜$2（仮定）
+- **詳細**: `scripts/build-observation-tree-v2/SETUP.md` 参照
+
 ### 6.7 Stripe（F3.5課金ゲート）— F7依存
 
 - **用途**: F3.5の再生成ボタン表示時に課金プラン状態を確認
@@ -426,6 +580,11 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 | フロントエンド | Next.js 16 + Tailwind CSS 4 + TypeScript 5 | F3.2アニメ・F3.3マーカーUI・F3.4アンケートUI |
 | 4体系データ（60アニマル）| `lib/data/animal-characters.ts`（基本データ・60type全件整備済み）+ `lib/data/destiny-number-database.ts`（1930-2030年運命数DB）+ TSK-DATA-XXX（レポート用詳細説明文・並行整備）| D10により 60type を採用。F2 API は 60type ID + `character` ラベルを返す |
 | プロフィール管理（D8）| Supabase `profiles.display_name` + `lib/constitution/name-moderation.ts`（新設）| 自由入力ユーザーネームの永続化とモデレーション。F1要件書で入力フォーム定義 |
+| **4 体系統合アルゴリズム（v1.2・D11）** | `lib/diagnostics/integration/{types,trunks,probability,hybrid-distance,harvest}.ts` | 純関数による決定論的計算で B-3（再現性破綻）を構造的に防止。LLM 不使用 |
+| **3 段階モデル Constitution（v1.2・D13）** | `lib/constitution/three-layer-model.ts`（`LAYER2_TO_LAYER1` / `HYBRID_DISTANCE_ALPHA` / `LAYER3_TO_LAYER1_MODULATION`）| 数値の単一の真実。要件書はシンボル参照のみ |
+| **4 体系語彙コーパス（v1.2・D12）** | `lib/data/three-layer-vocab/twigs/{zodiac,animal,mbti,rokusei}.ts`（合計 884 語）+ trunks 320 語（layer1/2/3.ts）| Hybrid Distance の Rule 部の語彙ソース。drift test で `animal-characters.ts` との公式呼称完全一致を強制 |
+| **観察軸ツリーパイプライン（v1.2・ビルド時）** | `scripts/build-observation-tree-v2/`（Vercel AI Gateway + Haiku 4.5 + 2 段 critique）| 4 体系 × 5 軸 = 20 セルの観察軸ツリー JSON 生成。DRY_RUN モードで CI 検証 |
+| **Anatta-Aware 構文ガード（v1.2・D13）** | `lib/constitution/banned-output-patterns.ts`（Phase 1 内新設）| 断定構文（「あなたは〇〇です」等）の機械検出。設計中枢 原則② の構造的実装 |
 
 ### 7.2 データフロー
 
@@ -568,6 +727,18 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - **F2 の60type算出ロジックがサポート外生年月日に対応できない（D10）**：1930年未満等のユーザーで60type算出失敗
   - *対策*: F2側で12type（`baseAnimal`）のみの算出にフォールバック。F3.1プロンプトも12typeのみで生成可能なルートを用意
 
+- **アルゴリズム実装と Constitution-as-Code の drift（v1.2・D13）**：要件書の記述とコードの数値が乖離し、デバッグ困難・仕様誤解
+  - *対策*: drift test（`lib/constitution/__tests__/drift.test.ts`）が AGENTS.md / 要件書とコードの照合を CI 実行。要件書には数値を直接書かず `HYBRID_DISTANCE_ALPHA.layer1ToLayer2` 等のシンボル参照のみ。違反は CI で検出
+
+- **Procrustean Mapping 問題の再発（v1.2・PR#66 由来）**：4 体系を 1 軸ずつに強制マッピングして副次的特徴のみ拾う品質劣化
+  - *対策*: 設計 3 原則「Profiles over Cells.」を要件書に明文化（D13）、`harvest()` が 5 軸プロファイルを保持する構造で構造的に防止。アルゴリズム変更時は本要件書 D11 への追記必須
+
+- **Anatta-Aware 構文ガード未実装によるレポート品質劣化（v1.2・D13）**：「あなたは〇〇です」等の断定構文がレポート本文に混入し、設計中枢 原則② 違反
+  - *対策*: `lib/constitution/banned-output-patterns.ts` を Phase 1 内に新設（D13・Gate 2）。CI で全プロンプトテンプレート + 生成サンプル（Vercel preview）を正規表現検査。違反検出時は PR ブロック
+
+- **`harvest()` の再現性破綻（v1.2・B-3）**：同一入力で異なる `HarvestResult` が返り、レポート品質の予測不能化
+  - *対策*: 純関数性の Vitest テスト（同一 input × 10 回で完全一致）を CI 必須化。LLM を呼ぶ構造変更（v3 で Embedding 導入時等）は本テスト互換性を Gate 1 で確認
+
 ---
 
 ## 10. ランニング費用と運用方針
@@ -602,7 +773,8 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 | 日付 | バージョン | 概要 | 承認者 |
 |---|---|---|---|
 | 2026-05-24 | v1.0 | 初版作成。F3_integrated-report_features.md（2026-05-21）のrequirements-grillセッション成果物を詳細要件定義書（Stage 2）として統合。spec-sync未実施項目（D3:蓄積データ反映型のF3.5記述）を本書で反映 | えんまさ |
-| 2026-05-25 | v1.1 | PR#60レビュー議論（議論ログ_PR60-F3要件レビュー.md）の Turn 6 を反映：D8（ユーザーネーム自由入力 → F3表示）、D9（生年月日表示・年齢非表示）、D10（60type化）の3決定を要件書に追加。F3.1.8〜10要件、`profiles` テーブル拡張、TSK-DATA-XXX並行整備、`lib/constitution/name-moderation.ts` 新設を追記。**未反映項目（議論Turn 5発の🔴4項目）は別議論で対応** | えんまさ |
+| 2026-05-25 | v1.1 | PR#60レビュー議論（20260525_議論ログ_PR60-F3要件レビュー.md）の Turn 6 を反映：D8（ユーザーネーム自由入力 → F3表示）、D9（生年月日表示・年齢非表示）、D10（60type化）の3決定を要件書に追加。F3.1.8〜10要件、`profiles` テーブル拡張、TSK-DATA-XXX並行整備、`lib/constitution/name-moderation.ts` 新設を追記。**未反映項目（議論Turn 5発の🔴4項目）は別議論で対応** | えんまさ |
+| **2026-05-29** | **v1.2** | **PR#66（`docs/f3-keyword-tree-rethink-plan`）の実装乖離を編入。`/expert-misaki-discussion`（議論ログ_F3要件書アップデート方針.md・桐谷×杏奈×みさき 5 ターン）の結論に基づく in-place 改訂。**①**§1 プロジェクト概要に統合層追加（4 層構成化）。②**§4.1A 統合アルゴリズム仕様（ヒラメ向け詳細・A.1〜A.5）。③**§4.1B 言語設計 Anatta-Aware Output（えんまさ向け詳細・B.1〜B.6）。④**§6 に `lib/diagnostics/integration/` と `scripts/build-observation-tree-v2/` の 2 件追加。⑤**§7 技術スタックに 5 件追加（統合アルゴリズム / 3 段階モデル Constitution / 4 体系語彙コーパス / 観察軸ツリーパイプライン / Anatta-Aware 構文ガード）。⑥**§9 リスクに 4 件追加（drift / Procrustean 再発 / 構文ガード未実装 / 再現性破綻）。改修方針 3 原則: Append, Don't Rewrite / Constitution Holds Values, Spec Holds Pointers / Layered Disclosure by Role。Stage 1 v1.2 と同時改訂（D11〜D13 + F3.1.11〜15）。**Gate 2 えんまさ承認待ち** | えんまさ承認待ち |
 
 ---
 
@@ -614,9 +786,9 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 **F3専用資料**:
 - `docs/output/F3/F3_integrated-report_features.md` — requirements-grillによるF3 Feature層精緻化（2026-05-21）
 - `docs/sandbox/endo/grill-sessions/2026-05-21_cocosil-F-f3-integrated-report.md` — F3 grillセッション記録（5サブフィーチャー全8問・40問完了）
-- `docs/discussions/議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則の確定議論
-- `docs/discussions/議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
-- `docs/discussions/議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（D8・D9・D10）の確定議論
+- `docs/discussions/20260503_議論ログ_安心フェーズ体験設計.md` — F3.2設計三原則の確定議論
+- `docs/discussions/20260507_議論ログ_imager2アーキ選定.md` — Vercel OG / gpt-image-2のアーキ選定根拠
+- `docs/discussions/20260525_議論ログ_PR60-F3要件レビュー.md` — PR#60要件書レビュー（2026-05-25）+ 追加3要望（D8・D9・D10）の確定議論
 - `lib/data/animal-characters.ts` — 60アニマル基本データ（ID 1〜60・`baseAnimal`/`character`/`color`）
 - `lib/data/destiny-number-database.ts` — 1930-2030年運命数DB（60type算出ロジックの土台）
 
@@ -630,6 +802,19 @@ F3が届けるのは単なる診断結果の表示ではなく、**「なぜ自�
 - `docs/output/tasks/TSK-UI-003-f3-report-ui.md` — F3 UI実装
 - `docs/output/tasks/TSK-API-008-f3-report-records-api.md` — F3レポート記録API
 - `docs/output/tasks/TSK-API-009-f3-report-regenerate-api.md` — F3.5 再生成API
+
+**v1.2 追加資料（PR#66 / F3.1 統合アルゴリズム関連）**:
+- `docs/output/decisions/f3-keyword-tree-integration-modification-plan-2026-05-28.md` — Procrustean → 幹と枝 改修計画（b3391ce、D11〜D13 の論拠）
+- `docs/output/goals/f3-keyword-tree-integration.md` — Tree of 4, Harvest 1. Vision/Outcome/Eval
+- `docs/discussions/議論ログ_ワードツリー構築改修.md` — Procrustean Mapping 問題の診断議論
+- `docs/discussions/議論ログ_F3要件書アップデート方針.md` — 本 v1.2 改訂方針議論（2026-05-29、桐谷×杏奈×みさき 5 ターン）
+- `docs/output/F3/animal-60-name-mapping.md` — 動物 60 公式呼称マッピング（drift test の根拠）
+- `lib/constitution/three-layer-model.ts` — 3 段階モデル Constitution（N:M 確率 / α / Modulator）
+- `lib/constitution/observation-axes.ts` — 5 観察軸 + 識メタ層
+- `lib/diagnostics/integration/` — 4 体系統合アルゴリズム純関数群（§4.1A の実装）
+- `lib/data/three-layer-vocab/twigs/` — 4 体系葉ノード語彙コーパス 884 語
+- `scripts/build-observation-tree-v2/` — 観察軸ツリービルドパイプライン v2（§6.Y）
+- `lib/constitution/banned-output-patterns.ts` — Anatta-Aware 構文ガード（Phase 1 内新設、§4.1B の実装）
 
 **設計基準（最上位）**:
 - `docs/input/concepts/COCOSiL設計中枢.md` — 設計中枢（Layer 0）

@@ -15,6 +15,7 @@ export * from './immutables'
 export * from './mutables'
 export * from './observation-axes'
 export * from './observation-tree-schema'
+export * from './three-layer-model'
 
 export const CONSTITUTION_VERSION = '1.0.0'
 export const CONSTITUTION_AS_OF = '2026-05-05'

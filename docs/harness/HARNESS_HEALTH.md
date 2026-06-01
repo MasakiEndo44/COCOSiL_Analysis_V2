@@ -14,7 +14,7 @@
 
 ### G10. Autogenesis Phase A — 行動テレメトリ基盤未整備
 - **状態：** ❗ 未解消
-- **詳細：** COCOSiL V2のデジタル生命体移行計画（`docs/discussions/議論ログ_デジタル生命体移行企画.md`）のPhase A着手に必要な行動テレメトリ基盤がゼロ。具体的に未整備のもの：
+- **詳細：** COCOSiL V2のデジタル生命体移行計画（`docs/discussions/20260504_議論ログ_デジタル生命体移行企画.md`）のPhase A着手に必要な行動テレメトリ基盤がゼロ。具体的に未整備のもの：
   - `events_telemetry` テーブル（Supabase migration未作成）
   - PostHogカスタムイベント5種（`chat_phase_transition` / `report_section_reread` / `insight_accept` / `action_specificity_score` / `session_return_7d`）の未実装
   - 内省スコア算出ロジック（再言語化率・矛盾受容率・行動記録の具体度）の未実装
@@ -32,7 +32,7 @@
   1. ✅ `.github/workflows/preview.yml` 作成（PR → Vercel プレビュー URL 自動生成・Gate 2 確認リンク付きコメントを PR に自動投稿）
   2. ✅ `.github/pull_request_template.md` 作成・更新（Gate 1 ヒラメ署名 + Gate 2 えんまさ確認チェックリスト + before/after サンプル欄）
 - **残作業：** Vitest 導入 + `lib/diagnostics/` の unit test（G1 残作業として追跡）
-- **設計根拠：** `docs/discussions/議論ログ_アトミック確認ループ設計.md` / `docs/output/decisions/harness-redesign-v2-2026-05-05.md`
+- **設計根拠：** `docs/discussions/20260504_議論ログ_アトミック確認ループ設計.md` / `docs/output/decisions/harness-redesign-v2-2026-05-05.md`
 
 ### ~~G8. まあみ claude_design フロー未定義~~ ✅ 解消（2026-05-03）
 - **解消内容：** `docs/harness/DESIGN_FLOW.md` を新規作成。Gate 1（Coherence）→ Gate 2（Compatibility）→ Gate 3（Fidelity）の3段階ゲートを定義。`docs/input/setup/claude_design_prompt_template.md` でclaudie_designへのコンテキストインジェクションを標準化。
@@ -61,7 +61,7 @@
 ### G11. PR template 自己審査構造（C2）
 - **状態：** ✅ 解消（2026-05-05）
 - **解消内容：** `.github/pull_request_template.md` の設計中枢チェック5問を「実装者判定列 / レビュアー判定列」の独立判定形式に変更。`.github/workflows/disagreement-detector.yml` で両者の差分を自動検知し、PRに議論喚起コメントを投稿する。`.claude/commands/start-task.md` Step 2.5 を「初期見立て」と明示し、PR templateの判定とは役割を分離。
-- **設計根拠：** `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則② / `docs/discussions/議論ログ_設計中枢運用落とし穴.md`（自己審査71%通過の研究）
+- **設計根拠：** `docs/output/decisions/harness-redesign-proposal-2026-05-05.md` 原則② / `docs/discussions/20260503_20260503_議論ログ_設計中枢運用落とし穴.md`（自己審査71%通過の研究）
 
 ### G12. Constitution as Comment（C1）
 - **状態：** ✅ 解消（2026-05-05）
