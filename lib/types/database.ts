@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      events_telemetry: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string | null
+          event_name: string
+          payload: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          session_id?: string | null
+          event_name: string
+          payload?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          session_id?: string | null
+          event_name?: string
+          payload?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
       diagnoses: {
         Row: {
           id: string
@@ -44,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      know_markers: {
+        Row: {
+          id: string
+          user_id: string | null
+          report_id: string | null
+          section_id: string
+          section_text: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          report_id?: string | null
+          section_id: string
+          section_text?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          report_id?: string | null
+          section_id?: string
+          section_text?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       mbti_results: {
         Row: {
           answers: Json | null
@@ -71,6 +125,60 @@ export type Database = {
           pci?: Json
           scores?: Json
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          display_name: string
+          birthday: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          display_name?: string
+          birthday?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          display_name?: string
+          birthday?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          id: string
+          user_id: string | null
+          storage_url: string
+          generated_at: string
+          regen_count: number
+          last_regen_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          storage_url: string
+          generated_at?: string
+          regen_count?: number
+          last_regen_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          storage_url?: string
+          generated_at?: string
+          regen_count?: number
+          last_regen_at?: string | null
         }
         Relationships: []
       }
