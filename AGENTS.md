@@ -141,6 +141,7 @@ COCOSiLは「現代の無明（むみょう）」を解消するために存在�
 ### Layer 3：開発層（AI委任OK）
 
 - `app/(auth)/**` / `app/(public)/**` — ページ・レイアウト（まあみ担当）
+  - LP（`app/page.tsx`）リデザイン ゴール定義（世界観統一・趣旨伝達・アイコン刷新）: [docs/output/goals/lp-redesign.md](docs/output/goals/lp-redesign.md)
 - `components/**` — UIコンポーネント（まあみ担当）
 - `app/api/**` — API ルート（ヒラメ担当・PR レビュー前提）
 
