@@ -118,8 +118,8 @@ function FluidOrb() {
           }
         `}</style>
       </div>
-      {/* ノイズグラデーション（2層） — グラデーションのバンディングを消し有機的な質感を与える */}
-      {/* 層1：粒状スプリンクル（高密度・高コントラスト） */}
+      {/* ノイズグラデーション（2層） — グラデーションのバンディングを消し有機的な質感を与える。feColorMatrix saturate=0 でホワイトノイズ化し色のザラつきを排除 */}
+      {/* 層1：粒状スプリンクル（高密度・モノクロ） */}
       <div
         aria-hidden
         style={{
@@ -127,13 +127,13 @@ function FluidOrb() {
           inset: 0,
           borderRadius: "50%",
           backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
           mixBlendMode: "overlay",
-          opacity: 0.55,
+          opacity: 0.35,
           pointerEvents: "none",
         }}
       />
-      {/* 層2：粗い有機ムラ（大きなうねりで奥行きを出す） */}
+      {/* 層2：粗い有機ムラ（大きなうねりで奥行きを出す・モノクロ） */}
       <div
         aria-hidden
         style={{
@@ -141,7 +141,7 @@ function FluidOrb() {
           inset: 0,
           borderRadius: "50%",
           backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E\")",
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E\")",
           backgroundSize: "100% 100%",
           mixBlendMode: "soft-light",
           opacity: 0.14,
@@ -180,68 +180,68 @@ export default function ReassurancePage() {
       className="bg-aurora flex flex-col min-h-dvh"
       style={{ color: "#1e1a3c" }}
     >
-    <div className="content-col flex flex-col flex-1 items-center justify-center px-6 gap-8">
-      {/* 上部テキスト */}
-      <div
-        className="flex flex-col items-center text-center"
-        style={fadeIn(showOrb)}
-      >
-        <p
-          className="text-2xl font-black leading-snug"
-          style={{ letterSpacing: "-0.01em" }}
-        >
-          あなたの結果が描けました。<br />
-          読む前に、ひとつだけ。
-        </p>
-      </div>
-
-      {/* 流体マーブルオーブ */}
-      <div className="flex items-center justify-center" style={fadeIn(showOrb)}>
-        <FluidOrb />
-      </div>
-
-      {/* 下部：メッセージ＋ボタン */}
-      <div className="w-full flex flex-col items-center gap-6">
-        {/* メッセージ: オーブの後にフェードイン */}
+      <div className="content-col flex flex-col flex-1 items-center justify-center px-6 gap-8">
+        {/* 上部テキスト */}
         <div
-          className="w-full text-center px-2"
-          style={{ maxWidth: 340, ...fadeIn(showMessage) }}
+          className="flex flex-col items-center text-center"
+          style={fadeIn(showOrb)}
         >
           <p
             className="text-2xl font-black leading-snug"
-            style={{ color: "#1e1a3c", letterSpacing: "-0.02em" }}
+            style={{ letterSpacing: "-0.01em" }}
           >
-            これは評価ではありません。
-          </p>
-          <p
-            className="text-2xl font-black leading-snug mt-2"
-            style={{ color: "#1e1a3c", letterSpacing: "-0.02em" }}
-          >
-            あなた自身を理解する<br />ための地図です。
+            あなたの結果が描けました。<br />
+            読む前に、ひとつだけ。
           </p>
         </div>
 
-        {/* ボタン: さらに間をおいてフェードイン */}
-        <div
-          className="w-full flex justify-center"
-          style={fadeIn(showButton)}
-        >
-          <button
-            type="button"
-            onClick={() => router.push("/diagnosis/result")}
-            className="btn-press w-full h-14 rounded-full text-base font-bold text-white"
-            style={{
-              background: "linear-gradient(135deg, #7c5cfc, #a78bfa)",
-              boxShadow: "0 4px 24px rgba(124,92,252,0.4)",
-              cursor: "pointer",
-              maxWidth: 400,
-            }}
-          >
-            統合レポートを読んでみる
-          </button>
+        {/* 流体マーブルオーブ */}
+        <div className="flex items-center justify-center" style={fadeIn(showOrb)}>
+          <FluidOrb />
         </div>
-      </div>
-    </div>{/* /content-col */}
+
+        {/* 下部：メッセージ＋ボタン */}
+        <div className="w-full flex flex-col items-center gap-6">
+          {/* メッセージ: オーブの後にフェードイン */}
+          <div
+            className="w-full text-center px-2"
+            style={{ maxWidth: 340, ...fadeIn(showMessage) }}
+          >
+            <p
+              className="text-2xl font-black leading-snug"
+              style={{ color: "#1e1a3c", letterSpacing: "-0.02em" }}
+            >
+              これは評価ではありません。
+            </p>
+            <p
+              className="text-2xl font-black leading-snug mt-2"
+              style={{ color: "#1e1a3c", letterSpacing: "-0.02em" }}
+            >
+              あなた自身を理解する<br />ための地図です。
+            </p>
+          </div>
+
+          {/* ボタン: さらに間をおいてフェードイン */}
+          <div
+            className="w-full flex justify-center"
+            style={fadeIn(showButton)}
+          >
+            <button
+              type="button"
+              onClick={() => router.push("/diagnosis/result")}
+              className="btn-press w-full h-14 rounded-full text-base font-bold text-white"
+              style={{
+                background: "linear-gradient(135deg, #7c5cfc, #a78bfa)",
+                boxShadow: "0 4px 24px rgba(124,92,252,0.4)",
+                cursor: "pointer",
+                maxWidth: 400,
+              }}
+            >
+              統合レポートを読んでみる
+            </button>
+          </div>
+        </div>
+      </div>{/* /content-col */}
     </div>
   );
 }
