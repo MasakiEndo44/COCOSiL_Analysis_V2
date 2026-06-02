@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
 import { MBTI_TYPES } from '@/lib/data/three-layer-vocab/twigs'
+import type { ObservationAxisId } from '@/lib/constitution/observation-axes'
 
 export const GenerateReportBodySchema = z.object({
   birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日付は YYYY-MM-DD 形式で指定してください'),
@@ -24,11 +25,36 @@ export interface GenerateReportResponse {
   error?: string
 }
 
+/** 4体系の識別子。four_lights テーブルの行キー。 */
+export type FourLightSystem = 'zodiac' | 'animal' | 'sixStar' | 'mbti'
+
+/**
+ * 4体系それぞれの読み取り（4つの視点テーブルの1行）。
+ * label（蟹座・リーダーとなるゾウ等）はLLMに生成させず route が既知入力から注入する
+ * （Harvest, Don't Hallucinate）。reading のみ LLM 生成。
+ */
+export interface FourLightReading {
+  system: FourLightSystem
+  label: string
+  reading: string
+}
+
+/**
+ * 5観察軸それぞれの「現れ方」（統合力テーブルの1行）。
+ * axisLabel は UI が OBSERVATION_AXES[axisKey].label_ja から導出（ドリフト防止）。
+ * manifestation のみ LLM 生成（評価語禁止・具体的な場面描写を内包）。
+ */
+export interface AxisManifestation {
+  axisKey: ObservationAxisId
+  manifestation: string
+}
+
 export interface ReportContent {
   catchphrase: string
-  opening: string
-  four_lights: string
-  integration: string
+  four_lights: FourLightReading[]
+  integration: AxisManifestation[]
+  /** 統合像＝識。5軸を貫く核を1つの像として描く文章（テーブル化しない・観の山場）。 */
+  core: string
   relational_hint: string
   closing: string
 }

@@ -2,54 +2,18 @@ import { ImageResponse } from 'next/og'
 import type { ReportContent } from './schemas'
 import { clampNameForOg } from '@/lib/constitution/name-moderation'
 
-const WIDTH = 1024
-const HEIGHT = 1792
+// SNSシェア専用カード（正方形）。フルレポートは画面内HTMLが主役で、
+// この画像は catchphrase ＋ 統合像(core)の核だけを伝えるシェアカードに降格。
+const WIDTH = 1080
+const HEIGHT = 1080
 
-function Section({
-  label,
-  text,
-  accent = false,
-}: {
-  label: string
-  text: string
-  accent?: boolean
-}) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        padding: '24px 32px',
-        background: accent ? 'rgba(124,92,252,0.06)' : 'transparent',
-        borderRadius: 16,
-        marginBottom: 4,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#7c5cfc',
-          letterSpacing: '0.08em',
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          display: 'flex',
-          fontSize: 18,
-          lineHeight: 1.7,
-          color: '#1e1a3c',
-          whiteSpace: 'pre-wrap',
-        }}
-      >
-        {text}
-      </div>
-    </div>
-  )
+/** core の冒頭を1〜2文だけ抜き、カードに収まる長さに丸める。 */
+function pickCoreExcerpt(core: string, maxLen = 120): string {
+  const text = core.trim()
+  if (text.length <= maxLen) return text
+  const head = text.slice(0, maxLen)
+  const lastBreak = Math.max(head.lastIndexOf('。'), head.lastIndexOf('、'))
+  return (lastBreak > 40 ? head.slice(0, lastBreak + 1) : head) + '…'
 }
 
 export async function buildOgImageResponse(
@@ -58,6 +22,7 @@ export async function buildOgImageResponse(
   birthday: string,
 ): Promise<ArrayBuffer> {
   const displayName = clampNameForOg(rawDisplayName ?? 'あなた')
+  const excerpt = pickCoreExcerpt(content.core)
 
   const imageResponse = new ImageResponse(
     (
@@ -68,106 +33,80 @@ export async function buildOgImageResponse(
           background: 'linear-gradient(160deg, #f5f0ff 0%, #fff 50%, #f0f4ff 100%)',
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '88px 80px',
           fontFamily: 'sans-serif',
         }}
       >
-        {/* ヘッダー */}
+        <div style={{ display: 'flex', fontSize: 22, color: '#9b8fbd', letterSpacing: '0.14em' }}>
+          COCOSiL 統合レポート
+        </div>
+
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '52px 48px 32px',
-            gap: 16,
+            fontSize: 48,
+            fontWeight: 900,
+            color: '#1e1a3c',
+            textAlign: 'center',
+            lineHeight: 1.25,
+            marginTop: 28,
           }}
         >
-          <div style={{ display: 'flex', fontSize: 13, color: '#9b8fbd', letterSpacing: '0.12em' }}>
-            COCOSiL 統合レポート
-          </div>
+          {displayName === 'あなた' ? 'あなたの地図' : `${displayName}さんの地図`}
+        </div>
+
+        {content.catchphrase && (
           <div
             style={{
               display: 'flex',
-              fontSize: 38,
-              fontWeight: 900,
-              color: '#1e1a3c',
+              fontSize: 34,
+              fontWeight: 700,
+              color: '#7c5cfc',
               textAlign: 'center',
-              lineHeight: 1.25,
+              padding: '18px 36px',
+              background: 'rgba(124,92,252,0.08)',
+              borderRadius: 48,
+              marginTop: 36,
             }}
           >
-            {displayName === 'あなた' ? 'あなたの地図' : `${displayName}さんの地図`}
+            {content.catchphrase}
           </div>
-          {content.catchphrase && (
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 22,
-                fontWeight: 700,
-                color: '#7c5cfc',
-                textAlign: 'center',
-                padding: '12px 24px',
-                background: 'rgba(124,92,252,0.08)',
-                borderRadius: 40,
-              }}
-            >
-              {content.catchphrase}
-            </div>
-          )}
-        </div>
+        )}
 
-        {/* 区切り線 */}
-        <div
-          style={{
-            display: 'flex',
-            height: 1,
-            background: 'linear-gradient(90deg, transparent, #c4b5fd, transparent)',
-            margin: '0 48px',
-          }}
-        />
+        {excerpt && (
+          <div
+            style={{
+              display: 'flex',
+              fontSize: 26,
+              lineHeight: 1.8,
+              color: '#3a3560',
+              textAlign: 'center',
+              marginTop: 44,
+              maxWidth: 820,
+            }}
+          >
+            {excerpt}
+          </div>
+        )}
 
-        {/* セクション群 */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 1,
-            padding: '24px 24px',
-            gap: 4,
-            overflow: 'hidden',
-          }}
-        >
-          {content.opening && (
-            <Section label="はじめに" text={content.opening} />
-          )}
-          {content.four_lights && (
-            <Section label="4つの視点" text={content.four_lights} />
-          )}
-          {content.integration && (
-            <Section label="統合像" text={content.integration} accent />
-          )}
-          {content.relational_hint && (
-            <Section label="大切な人との関係" text={content.relational_hint} />
-          )}
-          {content.closing && (
-            <Section label="おわりに" text={content.closing} />
-          )}
-        </div>
-
-        {/* フッター */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '20px 48px',
-            borderTop: '1px solid rgba(196,181,253,0.3)',
+            width: '100%',
+            marginTop: 'auto',
+            paddingTop: 48,
           }}
         >
           {birthday && (
-            <div style={{ display: 'flex', fontSize: 12, color: '#9b8fbd' }}>
+            <div style={{ display: 'flex', fontSize: 20, color: '#9b8fbd' }}>
               {birthday}生まれ
             </div>
           )}
-          <div style={{ display: 'flex', fontSize: 12, color: '#c4b5fd' }}>cocosil.jp</div>
+          <div style={{ display: 'flex', fontSize: 20, color: '#c4b5fd' }}>cocosil.jp</div>
         </div>
       </div>
     ),

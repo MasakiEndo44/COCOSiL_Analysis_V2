@@ -5,24 +5,26 @@ import { useRouter } from "next/navigation";
 import { SESSION_KEYS } from "@/lib/sessionKeys";
 import { KnowMarker } from "@/components/report/KnowMarker";
 import { SatisfactionSurvey } from "@/components/report/SatisfactionSurvey";
-import { buildFallbackSections } from "@/lib/reports/markdown-fallback";
+import { OBSERVATION_AXES } from "@/lib/constitution/observation-axes";
 import { gradientBtnStyle } from "@/lib/ui";
-import type { GenerateReportResponse, ReportContent } from "@/lib/reports/schemas";
+import type {
+  GenerateReportResponse,
+  ReportContent,
+  AxisManifestation,
+} from "@/lib/reports/schemas";
 
-const SECTION_LABELS: Record<string, string> = {
-  catchphrase: "あなたという人",
-  opening: "はじめに",
-  four_lights: "4つの視点",
-  integration: "統合像",
-  relational_hint: "大切な人との関係",
-  closing: "おわりに",
+// 5観察軸のモバイル短縮ラベル（テーブル左カラムの折り返し崩壊を防ぐ）
+const AXIS_SHORT_LABEL: Record<AxisManifestation["axisKey"], string> = {
+  embodied_pattern: "からだ",
+  emotional_response: "感じ方",
+  cognitive_style: "考え方",
+  motivation_drive: "動機",
+  relational_mode: "人との距離",
 };
 
 interface ReportState {
   reportId?: string;
-  reportUrl?: string;
   content?: ReportContent;
-  fallback: boolean;
 }
 
 function LoadingOrb() {
@@ -46,12 +48,69 @@ function LoadingOrb() {
   );
 }
 
+/** 2カラムの行テーブル。左ラベルは固定幅、右は可変（モバイル縦長で崩れない）。 */
+function RowTable({ rows }: { rows: { key: string; label: string; text: string }[] }) {
+  return (
+    <div
+      style={{
+        background: "#fff",
+        border: "1.5px solid #ede9f8",
+        borderRadius: 16,
+        overflow: "hidden",
+      }}
+    >
+      {rows.map((row, i) => (
+        <div
+          key={row.key}
+          style={{
+            display: "flex",
+            gap: 12,
+            padding: "14px 16px",
+            borderTop: i === 0 ? "none" : "1px solid #f1ecfa",
+          }}
+        >
+          <div
+            style={{
+              flex: "0 0 76px",
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: "#7c5cfc",
+              lineHeight: 1.5,
+              paddingTop: 2,
+            }}
+          >
+            {row.label}
+          </div>
+          <div style={{ flex: 1, fontSize: 14, lineHeight: 1.7, color: "#1e1a3c" }}>
+            {row.text}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <p
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: "#7c5cfc",
+        letterSpacing: "0.08em",
+        margin: "0 0 8px 4px",
+      }}
+    >
+      {children}
+    </p>
+  );
+}
+
 export default function ResultPage() {
   const router = useRouter();
   const [state, setState] = useState<ReportState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const calledRef = useRef(false);
 
   useEffect(() => {
@@ -93,12 +152,7 @@ export default function ResultPage() {
           setError(data.error ?? "レポートの生成に失敗しました。もう一度試してみてください。");
           return;
         }
-        setState({
-          reportId: data.reportId,
-          reportUrl: data.reportUrl,
-          content: data.content,
-          fallback: data.fallback ?? false,
-        });
+        setState({ reportId: data.reportId, content: data.content });
       })
       .catch(() => {
         setError("ネットワークエラーが発生しました。もう一度試してみてください。");
@@ -139,15 +193,23 @@ export default function ResultPage() {
 
   if (!state?.content) return null;
 
-  const { reportId, reportUrl, content, fallback } = state;
-  const sections = buildFallbackSections(content);
+  const { reportId, content } = state;
+
+  const lightRows = content.four_lights.map((light) => ({
+    key: light.system,
+    label: light.label,
+    text: light.reading,
+  }));
+
+  const axisRows = content.integration.map((axis) => ({
+    key: axis.axisKey,
+    label: AXIS_SHORT_LABEL[axis.axisKey] ?? OBSERVATION_AXES[axis.axisKey].label_ja,
+    text: axis.manifestation,
+  }));
 
   return (
-    <div
-      className="bg-aurora flex flex-col min-h-dvh"
-      style={{ color: "#1e1a3c" }}
-    >
-      <main className="content-col flex-1 flex flex-col px-5 pt-10 pb-6 gap-6">
+    <div className="bg-aurora flex flex-col min-h-dvh" style={{ color: "#1e1a3c" }}>
+      <main className="content-col flex-1 flex flex-col px-5 pt-10 pb-6 gap-7">
         {/* キャッチフレーズ */}
         {content.catchphrase && (
           <div style={{ textAlign: "center" }}>
@@ -167,71 +229,97 @@ export default function ResultPage() {
           </div>
         )}
 
-        {/* OG画像（あれば優先表示） */}
-        {reportUrl && !fallback && (
-          <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 24px rgba(124,92,252,0.12)" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={reportUrl}
-              alt="統合レポート"
-              width={1024}
-              height={1792}
-              style={{ width: "100%", height: "auto", display: imgLoaded ? "block" : "none" }}
-              onLoad={() => setImgLoaded(true)}
-            />
-            {!imgLoaded && (
-              <div style={{ background: "#f5f0ff", height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <LoadingOrb />
-              </div>
+        {/* 4つの視点（4体系テーブル） */}
+        <section>
+          <SectionHeading>4つの視点</SectionHeading>
+          <RowTable rows={lightRows} />
+        </section>
+
+        {/* 統合力（5観察軸テーブル） */}
+        <section>
+          <SectionHeading>統合力</SectionHeading>
+          <RowTable rows={axisRows} />
+        </section>
+
+        {/* 統合像（識・文章・観の山場） */}
+        <section>
+          <SectionHeading>あなたという人</SectionHeading>
+          <div
+            style={{
+              background: "rgba(124,92,252,0.05)",
+              border: "1.5px solid #e6def8",
+              borderRadius: 16,
+              padding: "20px 20px 16px",
+            }}
+          >
+            <p
+              style={{
+                fontSize: 15,
+                lineHeight: 1.85,
+                color: "#1e1a3c",
+                margin: "0 0 12px",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {content.core}
+            </p>
+            {reportId && (
+              <KnowMarker
+                reportId={reportId}
+                sectionId="core"
+                sectionText={content.core.slice(0, 200)}
+              />
             )}
           </div>
-        )}
+        </section>
 
-        {/* フォールバック: セクション別テキスト表示 */}
-        {(fallback || !reportUrl) && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {sections.map((section) => (
-              <div
-                key={section.id}
+        {/* 大切な人との関係 */}
+        {content.relational_hint && (
+          <section>
+            <SectionHeading>大切な人との関係</SectionHeading>
+            <div
+              style={{
+                background: "#fff",
+                border: "1.5px solid #ede9f8",
+                borderRadius: 16,
+                padding: "20px 20px 16px",
+              }}
+            >
+              <p
                 style={{
-                  background: section.id === "integration" ? "rgba(124,92,252,0.05)" : "#fff",
-                  border: "1.5px solid #ede9f8",
-                  borderRadius: 16,
-                  padding: "20px 20px 16px",
+                  fontSize: 15,
+                  lineHeight: 1.8,
+                  color: "#1e1a3c",
+                  margin: "0 0 12px",
+                  whiteSpace: "pre-wrap",
                 }}
               >
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#7c5cfc",
-                    letterSpacing: "0.08em",
-                    margin: "0 0 8px",
-                  }}
-                >
-                  {SECTION_LABELS[section.id] ?? section.label}
-                </p>
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.75,
-                    color: "#1e1a3c",
-                    margin: "0 0 12px",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {section.text}
-                </p>
-                {reportId && (
-                  <KnowMarker
-                    reportId={reportId}
-                    sectionId={section.id}
-                    sectionText={section.text.slice(0, 200)}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+                {content.relational_hint}
+              </p>
+              {reportId && (
+                <KnowMarker
+                  reportId={reportId}
+                  sectionId="relational_hint"
+                  sectionText={content.relational_hint.slice(0, 200)}
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* おわりに（背景に溶け込むベタ打ち） */}
+        {content.closing && (
+          <p
+            style={{
+              fontSize: 13,
+              lineHeight: 1.8,
+              color: "#8a85a6",
+              margin: "0 4px",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {content.closing}
+          </p>
         )}
 
         {/* 満足度アンケート (F3.4) */}
