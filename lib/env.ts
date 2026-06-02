@@ -27,6 +27,8 @@ const serverEnvSchema = z.object({
   // PostHog（Phase A テレメトリ — 未設定時はイベント送信をスキップ）
   POSTHOG_API_KEY: z.string().min(1).optional(),
   POSTHOG_HOST: z.url().optional(),
+  // OpenAI（F3 統合レポート生成）— 未設定時は generate API が 503 を返す
+  OPENAI_API_KEY: z.string().min(1).optional(),
 });
 
 export function getServerEnv() {
