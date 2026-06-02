@@ -3,13 +3,12 @@ import {
   resolveIntegratedReportSystemPrompt,
   buildIntegratedReportUserPrompt,
 } from '@/lib/prompts/integrated-report'
-import { getServerEnv } from '@/lib/env'
 import type { ReportContent } from './schemas'
 
 const TIMEOUT_MS = 30_000
 
 function getOpenAIClient(): OpenAI {
-  const apiKey = getServerEnv().OPENAI_API_KEY
+  const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) throw new Error('OPENAI_API_KEY is not configured')
   return new OpenAI({ apiKey })
 }
