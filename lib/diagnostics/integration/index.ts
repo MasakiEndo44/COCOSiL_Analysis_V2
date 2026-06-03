@@ -11,9 +11,5 @@ export {
   mbtiToKeirsey,
 } from './trunks'
 export { computeLayer1Distribution } from './probability'
-export {
-  computeAxisAffinity,
-  getLayerAlpha,
-  type AxisAffinity,
-} from './hybrid-distance'
+export { computeAxisScores, getAxisBounds } from './affinity-score'
 export { harvest } from './harvest'
