@@ -11,7 +11,7 @@ export {
   mbtiToKeirsey,
 } from './trunks'
 export { computeLayer1Distribution } from './probability'
-export { computeAxisScores, getAxisBounds } from './affinity-score'
+export { computeAxisScores, getAxisBounds, SYSTEM_WEIGHTS, type SystemWeightKey } from './affinity-score'
 export { harvest } from './harvest'
 export {
   PROFILE_CORE_VERSION,
