@@ -40,3 +40,4 @@ export {
   deriveStrengthsWeakness,
   type StrengthsWeakness,
 } from './derive-strengths-weakness'
+export { buildProfileCore, buildType32 } from './build-profile-core'
