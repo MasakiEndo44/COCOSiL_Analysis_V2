@@ -35,3 +35,8 @@ export {
 export { buildDistribution, getDesignSpaceScores } from './build-distribution'
 export { deriveBlindspots } from './derive-blindspots'
 export { buildCharacterLabel } from './build-character-label'
+export { rankAxes } from './rank-axes'
+export {
+  deriveStrengthsWeakness,
+  type StrengthsWeakness,
+} from './derive-strengths-weakness'
