@@ -41,25 +41,25 @@
 
 /** レポートのセクション識別子（F3.3 マーカーがセクション単位で参照する） */
 export const REPORT_SECTION_IDS = [
-  'catchphrase', // 一言の命名（20字程度）: OG見出し・レポートタイトル。止観の「観＝パターンの命名」。integrationの核を凝縮
-  'opening', // 導入: 地図メタファーの継承・読む構えづくり
-  'four_lights', // 4体系の手短な読み取り（観察の入口・羅列防止のため「4つのライト」として束ねる）
-  'integration', // 統合考察: 5軸を貫く「あなたの核」= 識（AC-1 必須）
+  'catchphrase', // 一言の命名（24字程度）: シェアカード見出し・レポートタイトル。止観の「観＝パターンの命名」。core の核を凝縮
+  'four_lights', // 4体系の読み取りテーブル（観察の入口・素材。4行）
+  'integration', // 5観察軸の現れ方テーブル（観察の素材。5行・評価語禁止）
+  'core', // 統合像＝識: 5軸を貫く「あなたの核」を1つの像として描く文章（AC-1 必須・観の山場）
   'relational_hint', // 大切な人との関係ヒント（AC-2 必須）
   'closing', // 結び: 地図として使う招待・F4チャットへの橋渡し
 ] as const
 
 export type ReportSectionId = (typeof REPORT_SECTION_IDS)[number]
 
-// セクションごとの目安文字数（Vercel OG 1024×1792 の縦長レイアウト崩壊を防ぐ上限）
-export const REPORT_SECTION_CHAR_LIMITS: Record<ReportSectionId, number> = {
-  catchphrase: 24, // 「20字程度」の運用上限。OG見出しのレイアウト崩壊を防ぐ
-  opening: 120,
-  four_lights: 360,
-  integration: 400,
-  relational_hint: 280,
-  closing: 140,
-}
+// 文章セクションの目安文字数。four_lights / integration は配列要素ごとの上限を別途持つ。
+export const REPORT_SECTION_CHAR_LIMITS = {
+  catchphrase: 24, // 「20字程度」の運用上限
+  four_lights_reading: 64, // 4体系 reading 1件あたり
+  integration_manifestation: 90, // 5軸 manifestation 1件あたり（場面描写を内包）
+  core: 320,
+  relational_hint: 220,
+  closing: 120,
+} as const
 
 export const INTEGRATED_REPORT_SYSTEM_PROMPT = `\
 あなたはCOCOSiLの分析パートナーです。心理学と4つの性格分析の知見にもとづいて、
@@ -83,6 +83,7 @@ export const INTEGRATED_REPORT_SYSTEM_PROMPT = `\
 - 断定しない。「〜です」ではなく「〜な傾向があります」「〜を大切にしていそうです」と書く。
 - 肯定を先に。強みや価値を示してから、課題や注意点にそっと触れる。
 - 評価しない。優劣・正解/不正解・「直すべき」という枠組みを持ち込まない。
+- 4体系・5軸を並べても、優劣・順位づけ・正解/不正解を持ち込まない。各項目は「良し悪し」ではなく「どう現れるか」だけを書く。
 - 年齢には一切触れない。
 - スピリチュアルな決め言葉（未来予測・的中・霊的な見立てを思わせる表現）は使わない。COCOSiLは根拠のある性格分析であり、運命を言い当てるものではない。
 - 4つのライトが食い違って見えるときは、欠陥ではなく「多面性」として描く。
@@ -91,13 +92,26 @@ export const INTEGRATED_REPORT_SYSTEM_PROMPT = `\
 {{address_instruction}}
 
 【出力形式】
-先に統合考察（integration）の核を見定めてから、それを一言に凝縮した catchphrase を作ってください。
+先に統合像（core）の核を見定めてから、それを一言に凝縮した catchphrase を作ってください。
+four_lights（4体系の読み取り）と integration（5軸の現れ方）は観察の素材です。
+system と axisKey の値は下記の指定文字列を一字一句変えずに、配列の順序も変えずに使ってください。
 必ず次のJSON構造のみを返してください（前後に説明文を付けない）:
 {
   "catchphrase": "この方を一言で表す命名（{{char_catchphrase}}字程度）。レポートの見出しに使う。優劣評価や決めつけではなく、4体系の観察から浮かんだパターンの『名づけ』として。未来予測や的中を思わせる言い回しは避ける。呼び名は入れない。",
-  "opening": "導入（{{char_opening}}字以内）。地図メタファーを継承し、これから読む構えをつくる。",
-  "four_lights": "4体系それぞれの短い読み取り（{{char_four_lights}}字以内）。各体系1〜2文。動物は60typeのcharacterラベルで呼ぶ。これは観察の入口であり、ここで完結させない。",
-  "integration": "統合考察（{{char_integration}}字以内）。5つの視点を貫いて浮かぶ『あなたの核』を1つの像として描く。4体系すべてに言及しながら、ラベルの羅列にしない（AC-1）。",
+  "four_lights": [
+    {"system": "zodiac", "reading": "星座から読み取れる傾向を1文（{{char_four_lights}}字以内）。特徴として書き、評価しない。"},
+    {"system": "animal", "reading": "動物タイプ(60type)から読み取れる傾向を1文（{{char_four_lights}}字以内）。60typeのcharacterラベルが示すタイプとして。"},
+    {"system": "sixStar", "reading": "六星から読み取れる傾向を1文（{{char_four_lights}}字以内）。"},
+    {"system": "mbti", "reading": "MBTIから読み取れる傾向を1文（{{char_four_lights}}字以内）。"}
+  ],
+  "integration": [
+    {"axisKey": "embodied_pattern", "manifestation": "身体・気質（テンポやエネルギーの出方）が日常のどんな場面でどう現れるか、具体的な場面を1つ添えて（{{char_integration}}字以内）。"},
+    {"axisKey": "emotional_response", "manifestation": "感情の動き方が、具体的な場面でどう現れるか（{{char_integration}}字以内）。"},
+    {"axisKey": "cognitive_style", "manifestation": "物事のとらえ方・決め方が、具体的な場面でどう現れるか（{{char_integration}}字以内）。"},
+    {"axisKey": "motivation_drive", "manifestation": "何に駆動されるかが、具体的な場面でどう現れるか（{{char_integration}}字以内）。"},
+    {"axisKey": "relational_mode", "manifestation": "人との距離の取り方が、具体的な場面でどう現れるか（{{char_integration}}字以内）。"}
+  ],
+  "core": "統合像＝識（{{char_core}}字以内）。5つの視点を貫いて浮かぶ『あなたの核』を1つの像として描く。4体系すべてに言及しながら、ラベルの羅列にしない（AC-1）。4体系・5軸が食い違って見える点は、欠陥ではなく『多面性』として結ぶ（一見矛盾する2面を、ひとつの動き方の表と裏として説明する）。",
   "relational_hint": "大切な人との関係ヒント（{{char_relational_hint}}字以内）。自己理解を対人関係にどう活かせるか、具体的な関わり方の手がかりを示す（AC-2）。",
   "closing": "結び（{{char_closing}}字以内）。この地図は自分を決めるものではなく今いる場所を知るためのもの、と伝え、続きを一緒に話す招待で締める。"
 }` as const
@@ -142,9 +156,15 @@ export function resolveIntegratedReportSystemPrompt(hasName: boolean): string {
     addressInstruction,
   )
     .replace('{{char_catchphrase}}', String(REPORT_SECTION_CHAR_LIMITS.catchphrase))
-    .replace('{{char_opening}}', String(REPORT_SECTION_CHAR_LIMITS.opening))
-    .replace('{{char_four_lights}}', String(REPORT_SECTION_CHAR_LIMITS.four_lights))
-    .replace('{{char_integration}}', String(REPORT_SECTION_CHAR_LIMITS.integration))
+    .replaceAll(
+      '{{char_four_lights}}',
+      String(REPORT_SECTION_CHAR_LIMITS.four_lights_reading),
+    )
+    .replaceAll(
+      '{{char_integration}}',
+      String(REPORT_SECTION_CHAR_LIMITS.integration_manifestation),
+    )
+    .replace('{{char_core}}', String(REPORT_SECTION_CHAR_LIMITS.core))
     .replace(
       '{{char_relational_hint}}',
       String(REPORT_SECTION_CHAR_LIMITS.relational_hint),
