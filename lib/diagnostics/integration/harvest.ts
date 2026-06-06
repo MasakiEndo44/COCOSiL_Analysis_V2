@@ -2,11 +2,14 @@
 //
 // 設計根拠:
 //   - docs/output/goals/f3-keyword-tree-integration.md (Tree of 4, Harvest 1.)
+//   - docs/output/decisions/20260602_harvest親和行列_根拠表.md (スコアモデル再設計)
 //   - lib/constitution/observation-axes.ts (5 軸 + META_LAYER)
+//   - lib/constitution/axis-affinity-matrix.ts (構造的親和行列)
 //
 // 設計原則:
 //   ③ Harvest, Don't Hallucinate — LLM を呼ばず純関数で導出。
 //      再現性 (B-3 防止) と禁止語混入ゼロを構造的に保証。
+//   Map, Don't Match — Trunks→軸を理論的親和行列で写像し substring 照合を廃する。
 
 import {
   OBSERVATION_AXES,
@@ -14,33 +17,12 @@ import {
 } from '@/lib/constitution/observation-axes'
 import { resolveFourSystemTrunks } from './trunks'
 import { computeLayer1Distribution } from './probability'
-import { computeAxisAffinity } from './hybrid-distance'
+import { computeAxisScores } from './affinity-score'
 import type {
-  FourSystemTrunks,
   HarvestResult,
   ObservationAxisId,
   UserDiagnosticInput,
 } from './types'
-
-// ============================================================================
-// 軸別スコア集約: Layer 1→2 と Layer 2→3 の hybrid 平均を [0, 1] にクリップ
-// ============================================================================
-
-function aggregateAxisScore(
-  trunks: FourSystemTrunks,
-  axis: ObservationAxisId,
-): number {
-  const aff1 = computeAxisAffinity(trunks, axis, 'layer1')
-  const aff2 = computeAxisAffinity(trunks, axis, 'layer2')
-  // Layer 3 は phase 指定時のみ意味を持つ
-  const aff3 = trunks.phase
-    ? computeAxisAffinity(trunks, axis, 'layer3')
-    : null
-
-  const values = aff3 ? [aff1.hybrid, aff2.hybrid, aff3.hybrid] : [aff1.hybrid, aff2.hybrid]
-  const avg = values.reduce((a, b) => a + b, 0) / values.length
-  return Math.max(0, Math.min(1, avg))
-}
 
 // ============================================================================
 // 識 (META_LAYER): 5 軸スコアから自然な日本語要約を branching で生成
@@ -97,11 +79,7 @@ export function harvest(input: UserDiagnosticInput): HarvestResult {
   const trunks = resolveFourSystemTrunks(input)
   const layer1Distribution = computeLayer1Distribution(trunks, input.phase)
 
-  const axisScores = {} as Record<ObservationAxisId, number>
-  for (const axis of OBSERVATION_AXIS_IDS) {
-    axisScores[axis] = aggregateAxisScore(trunks, axis)
-  }
-
+  const axisScores = computeAxisScores(trunks)
   const meta = generateMeta(axisScores)
   return { axisScores, meta, trunks, layer1Distribution }
 }
