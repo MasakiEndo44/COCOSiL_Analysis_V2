@@ -34,3 +34,4 @@ export {
 } from './profile-core'
 export { buildDistribution, getDesignSpaceScores } from './build-distribution'
 export { deriveBlindspots } from './derive-blindspots'
+export { buildCharacterLabel } from './build-character-label'
