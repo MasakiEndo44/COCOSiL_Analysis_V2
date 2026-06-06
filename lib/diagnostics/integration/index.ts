@@ -13,3 +13,19 @@ export {
 export { computeLayer1Distribution } from './probability'
 export { computeAxisScores, getAxisBounds } from './affinity-score'
 export { harvest } from './harvest'
+export {
+  PROFILE_CORE_VERSION,
+  ProfileCoreSchema,
+  AxisScoresSchema,
+  ProfileWeightsSchema,
+  IdentitySchema,
+  Type32Schema,
+  CharacterLabelSchema,
+  StrengthsSchema,
+  WeaknessSchema,
+  JohariBlindspotSchema,
+  DistributionEntrySchema,
+  type ProfileCore,
+  type Identity,
+  type Type32,
+} from './profile-core'
