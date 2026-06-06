@@ -62,6 +62,10 @@ TSK-[分類]-[番号3桁]
 | **TSK-PROMPT-001** | F3 統合レポートプロンプト | えんまさ | 🔵 設計中 | [#36](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/36) | [TSK-PROMPT-001-f3-report-prompt.md](output/tasks/TSK-PROMPT-001-f3-report-prompt.md) | [§4.3](output/requirements/cocosil_v2_detailed_requirements_specification.md) |
 | **TSK-API-008** | F3 レポート付随API（しっくりきたマーカー・満足度アンケート） | ヒラメ | 🔵 設計中 | [#56](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/56) | [TSK-API-008-f3-report-records-api.md](output/tasks/TSK-API-008-f3-report-records-api.md) | [F3要件](output/F3/F3_integrated-report_features.md) §3-4 |
 | **TSK-API-009** | F3.5 レポート再生成API（蓄積データ反映・課金ゲート） | ヒラメ | 🔵 設計中 | [#57](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/57) | [TSK-API-009-f3-report-regenerate-api.md](output/tasks/TSK-API-009-f3-report-regenerate-api.md) | [F3要件](output/F3/F3_integrated-report_features.md) §5-6 |
+| **TSK-DB-002** | F3 MBTI A/T(Identity)軸の導入（入力ベクトル一意化） | ヒラメ | 🔵 設計中 | [#75](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/75) | [TSK-DB-002-f3-mbti-identity-axis.md](output/tasks/TSK-DB-002-f3-mbti-identity-axis.md) | [揺らぎ改善](output/goals/f3-report-determinism-and-self-anchor.md) ／ [§4.2](output/requirements/cocosil_v2_detailed_requirements_specification.md) |
+| **TSK-API-010** | F3 ProfileCore 決定論スコア核（揺らぎ抑制） | ヒラメ | 🔵 設計中 | [#74](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/74) | [TSK-API-010-f3-profile-core.md](output/tasks/TSK-API-010-f3-profile-core.md) | [揺らぎ改善](output/goals/f3-report-determinism-and-self-anchor.md) ／ [§4.3](output/requirements/cocosil_v2_detailed_requirements_specification.md) |
+
+> **F3 揺らぎ抑制（2026-06-02 FB起点）**: 上記 TSK-DB-002 / TSK-API-010 が新規核。Phase 2/3/4 は既存 #36(TSK-PROMPT-001) / #35(TSK-API-002) / #34(TSK-UI-003) に「揺らぎ抑制要件」を追記済み。全体設計: [実装計画](output/goals/f3-report-determinism-implementation-plan.md)
 
 ---
 
