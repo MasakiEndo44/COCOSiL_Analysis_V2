@@ -6,4 +6,5 @@ export const SESSION_KEYS = {
   BIRTH_DATE: "birth_date",
   MBTI_SELECTED: "mbti_selected",
   MBTI_TYPE: "mbti_type",
+  MBTI_IDENTITY: "mbti_identity",
 } as const;
