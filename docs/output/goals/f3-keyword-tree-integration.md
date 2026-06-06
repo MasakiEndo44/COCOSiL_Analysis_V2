@@ -273,4 +273,15 @@ F3.1 受け入れ基準 AC-1 が「統合考察1セクション以上（人間�
 
 ---
 
+## ⚠️ 実装検証メモ（2026-06-02）— アルゴリズム機能不全を検出
+
+> F3レポートUI改善タスクの事前チェックで `harvest()` を実測したところ、**テストは全件パスするが意味的に機能していない**ことが判明した。Issue化済み: **[#72](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/72)**。
+
+- **症状**: 5観察軸スコアが全ユーザー・全軸でほぼ同値（≈0.20、spread 0.004〜0.010）に潰れ、個体差・軸の収束を検出できない。識メタ文は5ペルソナ横断で同一・phase変調も無効。`generateMeta` の `topScore>=0.45 / >=0.6` 分岐は到達不能（dead code）。
+- **根本原因①**: embedding が stub 固定（0.5）で `hybrid = α·rule + (1−α)·0.5` の定数項が支配（`lib/diagnostics/integration/hybrid-distance.ts`）。
+- **根本原因②**: rule 正規化 `matches /(vocab.length × keywords.length)` の分母が積のため信号が潰れ（rule全平均 0.0047）、「複数体系が同一軸に収束＝幹が太る」現象が消える。
+- **影響**: 設計原則③ Harvest, Don't Hallucinate が system レベルで未達。ただし F3レポートUI改善（テーブル構造化）とは疎結合で、UI改善は先行可能。アルゴリズム修正は #72 で対応。
+
+---
+
 *本書は goal-grill（3層 Vision/Outcome/Eval）2026-05-26 セッションの成果物。議論基盤: `docs/discussions/20260527_議論ログ_F3-1キーワードツリー4体系統合アルゴリズム.md`*
