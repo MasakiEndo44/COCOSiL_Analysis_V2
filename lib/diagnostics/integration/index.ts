@@ -28,4 +28,9 @@ export {
   type ProfileCore,
   type Identity,
   type Type32,
+  type JohariBlindspot,
+  type DistributionEntry,
+  type DistributionOrigin,
 } from './profile-core'
+export { buildDistribution, getDesignSpaceScores } from './build-distribution'
+export { deriveBlindspots } from './derive-blindspots'

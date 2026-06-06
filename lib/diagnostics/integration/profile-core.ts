@@ -81,6 +81,7 @@ export const JohariBlindspotSchema = z.object({
   text: z.string().min(1),
   sourceAxis: z.enum(OBSERVATION_AXIS_IDS),
 })
+export type JohariBlindspot = z.infer<typeof JohariBlindspotSchema>
 
 /**
  * 分布比較。母集団を「一般分布」と詐称せず出自を正直に明示する。
@@ -91,6 +92,8 @@ export const DistributionEntrySchema = z.object({
   percentile: z.number().min(0).max(100),
   origin: z.enum(['同タイプ内傾向', '設計上の理論分布']),
 })
+export type DistributionEntry = z.infer<typeof DistributionEntrySchema>
+export type DistributionOrigin = DistributionEntry['origin']
 
 /**
  * 体系別寄与重み。算命学:MBTI≈1:1 の曖昧さを廃し、採用した重みを明示記録する。
