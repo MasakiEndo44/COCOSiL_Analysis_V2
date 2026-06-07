@@ -7,102 +7,106 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.4"
-  }
   public: {
     Tables: {
-      events_telemetry: {
+      diagnoses: {
         Row: {
+          animal_character: string | null
+          animal_type: string | null
+          calculated_at: string
           id: string
-          user_id: string
-          session_id: string | null
-          event_name: string
-          payload: Json
-          created_at: string
+          six_star: string | null
+          user_id: string | null
+          zodiac_sign: string | null
         }
         Insert: {
+          animal_character?: string | null
+          animal_type?: string | null
+          calculated_at?: string
           id?: string
-          user_id: string
-          session_id?: string | null
-          event_name: string
-          payload?: Json
-          created_at?: string
+          six_star?: string | null
+          user_id?: string | null
+          zodiac_sign?: string | null
         }
         Update: {
+          animal_character?: string | null
+          animal_type?: string | null
+          calculated_at?: string
           id?: string
-          user_id?: string
-          session_id?: string | null
-          event_name?: string
-          payload?: Json
-          created_at?: string
+          six_star?: string | null
+          user_id?: string | null
+          zodiac_sign?: string | null
         }
         Relationships: []
       }
-      diagnoses: {
+      events_telemetry: {
         Row: {
+          created_at: string
+          event_name: string
           id: string
-          user_id: string | null
-          zodiac_sign: string | null
-          animal_type: string | null
-          animal_character: string | null
-          six_star: string | null
-          calculated_at: string
+          payload: Json
+          session_id: string | null
+          user_id: string
         }
         Insert: {
+          created_at?: string
+          event_name: string
           id?: string
-          user_id?: string | null
-          zodiac_sign?: string | null
-          animal_type?: string | null
-          animal_character?: string | null
-          six_star?: string | null
-          calculated_at?: string
+          payload?: Json
+          session_id?: string | null
+          user_id: string
         }
         Update: {
+          created_at?: string
+          event_name?: string
           id?: string
-          user_id?: string | null
-          zodiac_sign?: string | null
-          animal_type?: string | null
-          animal_character?: string | null
-          six_star?: string | null
-          calculated_at?: string
+          payload?: Json
+          session_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
       know_markers: {
         Row: {
+          created_at: string
           id: string
-          user_id: string | null
           report_id: string | null
           section_id: string
           section_text: string | null
-          created_at: string
+          user_id: string | null
         }
         Insert: {
+          created_at?: string
           id?: string
-          user_id?: string | null
           report_id?: string | null
           section_id: string
           section_text?: string | null
-          created_at?: string
+          user_id?: string | null
         }
         Update: {
+          created_at?: string
           id?: string
-          user_id?: string | null
           report_id?: string | null
           section_id?: string
           section_text?: string | null
-          created_at?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "know_markers_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mbti_results: {
         Row: {
           answers: Json | null
           created_at: string
           id: string
+          identity: string | null
           mbti_type: string
           pci: Json
           scores: Json
@@ -112,6 +116,7 @@ export type Database = {
           answers?: Json | null
           created_at?: string
           id?: string
+          identity?: string | null
           mbti_type: string
           pci: Json
           scores: Json
@@ -121,6 +126,7 @@ export type Database = {
           answers?: Json | null
           created_at?: string
           id?: string
+          identity?: string | null
           mbti_type?: string
           pci?: Json
           scores?: Json
@@ -130,55 +136,55 @@ export type Database = {
       }
       profiles: {
         Row: {
-          id: string
-          user_id: string
-          display_name: string
           birthday: string | null
           created_at: string
+          display_name: string
+          id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          display_name?: string
           birthday?: string | null
           created_at?: string
+          display_name?: string
+          id?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          display_name?: string
           birthday?: string | null
           created_at?: string
+          display_name?: string
+          id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       reports: {
         Row: {
-          id: string
-          user_id: string | null
-          storage_url: string
           generated_at: string
-          regen_count: number
+          id: string
           last_regen_at: string | null
+          regen_count: number
+          storage_url: string
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          user_id?: string | null
-          storage_url: string
           generated_at?: string
-          regen_count?: number
+          id?: string
           last_regen_at?: string | null
+          regen_count?: number
+          storage_url: string
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string | null
-          storage_url?: string
           generated_at?: string
-          regen_count?: number
+          id?: string
           last_regen_at?: string | null
+          regen_count?: number
+          storage_url?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -320,3 +326,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

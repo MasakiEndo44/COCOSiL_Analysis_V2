@@ -89,6 +89,26 @@ export const MBTI_QUESTIONS: MbtiQuestion[] = [
     axis: "JP",
     direction: "positive", // J 寄り
   },
+
+  // ---- A/T (アイデンティティ: 自己主張型 / 慎重型) ----
+  {
+    id: 13,
+    text: "自分の判断や能力にはおおむね自信があり、結果が出るかどうかを過度に心配することは少ない。",
+    axis: "AT",
+    direction: "positive", // A 寄り
+  },
+  {
+    id: 14,
+    text: "物事がうまくいっているときでも、「何か見落としているのでは」と気になって落ち着かないことがある。",
+    axis: "AT",
+    direction: "reverse", // T 寄り (逆転項目)
+  },
+  {
+    id: 15,
+    text: "失敗したり人から低く評価されたりしても、あまり引きずらず、気持ちを切り替えて前に進める方だ。",
+    axis: "AT",
+    direction: "positive", // A 寄り
+  },
 ];
 
 /** リッカート尺度のラベル */

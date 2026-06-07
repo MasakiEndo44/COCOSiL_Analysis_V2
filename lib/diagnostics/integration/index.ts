@@ -11,5 +11,33 @@ export {
   mbtiToKeirsey,
 } from './trunks'
 export { computeLayer1Distribution } from './probability'
-export { computeAxisScores, getAxisBounds } from './affinity-score'
+export { computeAxisScores, getAxisBounds, SYSTEM_WEIGHTS, type SystemWeightKey } from './affinity-score'
 export { harvest } from './harvest'
+export {
+  PROFILE_CORE_VERSION,
+  ProfileCoreSchema,
+  AxisScoresSchema,
+  ProfileWeightsSchema,
+  IdentitySchema,
+  Type32Schema,
+  CharacterLabelSchema,
+  StrengthsSchema,
+  WeaknessSchema,
+  JohariBlindspotSchema,
+  DistributionEntrySchema,
+  type ProfileCore,
+  type Identity,
+  type Type32,
+  type JohariBlindspot,
+  type DistributionEntry,
+  type DistributionOrigin,
+} from './profile-core'
+export { buildDistribution, getDesignSpaceScores } from './build-distribution'
+export { deriveBlindspots } from './derive-blindspots'
+export { buildCharacterLabel } from './build-character-label'
+export { rankAxes } from './rank-axes'
+export {
+  deriveStrengthsWeakness,
+  type StrengthsWeakness,
+} from './derive-strengths-weakness'
+export { buildProfileCore, buildType32 } from './build-profile-core'

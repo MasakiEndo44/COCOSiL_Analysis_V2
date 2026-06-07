@@ -37,10 +37,16 @@ export async function POST(request: Request) {
         );
       }
 
+      // 直接選択は 16 型。A/T はスライダーの自己申告 (body.identity) を用い、
+      // 未指定時のみ中立 (T) にフォールバックする。
+      const directIdentity =
+        body.identity === "A" || body.identity === "T" ? body.identity : "T";
       result = {
         mbtiType: type,
-        scores: { EI: 9, SN: 9, TF: 9, JP: 9 },
-        pci: { EI: 0, SN: 0, TF: 0, JP: 0 },
+        identity: directIdentity,
+        mbti32Type: `${type}-${directIdentity}`,
+        scores: { EI: 9, SN: 9, TF: 9, JP: 9, AT: 9 },
+        pci: { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 },
       };
     } else {
       // ---- 通常回答 ----
@@ -81,6 +87,7 @@ export async function POST(request: Request) {
     const supabase = getSupabaseClient();
     const insertRow: TablesInsert<"mbti_results"> = {
       mbti_type: result.mbtiType,
+      identity: result.identity,
       scores: result.scores as unknown as Json,
       pci: result.pci as unknown as Json,
       answers: (body.answers as unknown as Json) ?? null,

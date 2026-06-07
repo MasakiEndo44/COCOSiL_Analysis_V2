@@ -59,9 +59,20 @@ const GROUPS = [
   },
 ];
 
+// A/T スライダー: 値(1-5) → identity('A'|'T') と表示ラベル。3(中立)は T にフォールバック。
+function identityFromSlider(value: number): "A" | "T" {
+  return value >= 4 ? "A" : "T";
+}
+function sliderLabel(value: number): string {
+  if (value <= 2) return "じっくり型";
+  if (value >= 4) return "どっしり型";
+  return "どちらともいえない";
+}
+
 export default function MbtiSelectPage() {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
+  const [identityVal, setIdentityVal] = useState(3);
   const [maxReached, setMaxReached] = useState(0);
   const [visible, setVisible] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -72,6 +83,9 @@ export default function MbtiSelectPage() {
     setMaxReached(getMaxReached());
     const saved = sessionStorage.getItem(SESSION_KEYS.MBTI_SELECTED);
     if (saved) setSelected(saved);
+    const savedId = sessionStorage.getItem(SESSION_KEYS.MBTI_IDENTITY);
+    if (savedId === "A") setIdentityVal(4);
+    else if (savedId === "T") setIdentityVal(2);
     const t = setTimeout(() => setVisible(true), 60);
     return () => clearTimeout(t);
   }, []);
@@ -88,6 +102,10 @@ export default function MbtiSelectPage() {
   function handleConfirm() {
     if (!selected) return;
     sessionStorage.setItem(SESSION_KEYS.MBTI_TYPE, selected);
+    sessionStorage.setItem(
+      SESSION_KEYS.MBTI_IDENTITY,
+      identityFromSlider(identityVal),
+    );
     router.push("/diagnosis/reassurance");
   }
 
@@ -150,7 +168,48 @@ export default function MbtiSelectPage() {
           ))}
         </div>
 
-        <div ref={buttonRef} className="px-5 mt-8 flex flex-col gap-3" style={fi(visible, 0.5)}>
+        <div className="px-5 mt-8" style={fi(visible, 0.46)}>
+          <div className="rounded-2xl p-5" style={{ background: "rgba(124,92,252,0.06)" }}>
+            <h2 className="text-base font-bold mb-1">もう少しだけ、あなたに近いのは？</h2>
+            <p className="text-xs text-[#7b7b9d] leading-relaxed mb-4">
+              同じタイプでも、心の&ldquo;構え&rdquo;で印象が変わります。近いと感じる方へ動かしてください（あとから変えられます）。
+            </p>
+
+            <input
+              type="range"
+              min={1}
+              max={5}
+              step={1}
+              value={identityVal}
+              onChange={(e) => setIdentityVal(Number(e.target.value))}
+              aria-label="じっくり型とどっしり型のあいだで自分に近い方を選ぶ"
+              className="w-full"
+              style={{ accentColor: "#7c5cfc" }}
+            />
+
+            <div className="flex justify-between text-[11px] text-[#9b97b8] mt-1">
+              <span>じっくり型</span>
+              <span>どちらとも</span>
+              <span>どっしり型</span>
+            </div>
+
+            <div className="mt-3 text-center">
+              <span
+                className="inline-block rounded-full px-3 py-1 text-xs font-bold"
+                style={{ background: "rgba(124,92,252,0.12)", color: "#7c5cfc" }}
+              >
+                {sliderLabel(identityVal)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-4 text-[11px] leading-relaxed text-[#7b7b9d]">
+              <p><b className="text-[#5b5780]">じっくり型</b><br />細かく見直し、よりよくしようと工夫する構え</p>
+              <p><b className="text-[#5b5780]">どっしり型</b><br />自分の判断を信じ、落ち着いて進める構え</p>
+            </div>
+          </div>
+        </div>
+
+        <div ref={buttonRef} className="px-5 mt-6 flex flex-col gap-3" style={fi(visible, 0.5)}>
           <div className="flex items-center gap-1.5 mb-1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="#b0aec8" strokeWidth="1.5"/>

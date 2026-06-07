@@ -1,5 +1,6 @@
 import { MBTI_QUESTIONS } from "./questions";
 import type {
+  Identity,
   MbtiAnswer,
   MbtiAxis,
   MbtiPCI,
@@ -26,15 +27,22 @@ import type {
 export function calculateMbtiResult(answers: MbtiAnswer[]): MbtiResult {
   const scores = calculateScores(answers);
   const mbtiType = deriveType(scores);
+  const identity = deriveIdentity(scores);
   const pci = calculatePCI(scores);
 
-  return { mbtiType, scores, pci };
+  return {
+    mbtiType,
+    identity,
+    mbti32Type: `${mbtiType}-${identity}`,
+    scores,
+    pci,
+  };
 }
 
 // ---- internal helpers ----
 
 function calculateScores(answers: MbtiAnswer[]): MbtiScores {
-  const axisScores: MbtiScores = { EI: 0, SN: 0, TF: 0, JP: 0 };
+  const axisScores: MbtiScores = { EI: 0, SN: 0, TF: 0, JP: 0, AT: 0 };
 
   for (const answer of answers) {
     const question = MBTI_QUESTIONS.find((q) => q.id === answer.questionId);
@@ -60,6 +68,11 @@ function deriveType(scores: MbtiScores): string {
   return `${e_i}${s_n}${t_f}${j_p}`;
 }
 
+function deriveIdentity(scores: MbtiScores): Identity {
+  const MID = 9; // 中央値
+  return scores.AT > MID ? "A" : "T"; // tie → T (慎重型)
+}
+
 function calculatePCI(scores: MbtiScores): MbtiPCI {
   const MID = 9;
   const MAX_DEVIATION = 6; // 15 - 9 or 9 - 3
@@ -72,6 +85,7 @@ function calculatePCI(scores: MbtiScores): MbtiPCI {
     SN: pci("SN"),
     TF: pci("TF"),
     JP: pci("JP"),
+    AT: pci("AT"),
   };
 }
 
