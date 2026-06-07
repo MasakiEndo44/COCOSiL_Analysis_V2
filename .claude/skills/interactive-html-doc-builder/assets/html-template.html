@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  interactive-html-doc-builder — 基底HTMLテンプレート
+  出典: docs/output/help/index.html（TSK-DOCS-002 の正解実装）
+
+  使い方:
+  1. {{...}} プレースホルダを実際の内容に置換する。
+  2. タブ数・パネル数は対象ドキュメントの観点数に合わせて増減する
+     （tab-btn の data-target と panel の id を 1:1 で対応させる）。
+  3. 下部「コンポーネントギャラリー」から必要なスニペットを section 内にコピーする。
+     ギャラリーのパネル（id="gallery"）は最終成果物では削除する。
+  4. styles-base.css / scripts-interactive.js を成果物ディレクトリに併置する
+     （ファイル名を変える場合は下の link / script の href・src も合わせる）。
+  ============================================================
+-->
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <title>{{PAGE_TITLE}}</title>
+  <link rel="stylesheet" href="styles-base.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <p><span class="badge">{{BADGE_AUDIENCE}}</span><span class="badge">{{BADGE_VERSION}}</span></p>
+      <h1>{{PAGE_HEADING}}</h1>
+      <p class="subtitle">
+        {{PAGE_SUBTITLE}}
+      </p>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="{{TABS_ARIA_LABEL}}">
+      <button class="tab-btn" role="tab" data-target="perspective-1" aria-controls="perspective-1" aria-selected="false">
+        <span class="tab-index">1</span>{{TAB_1_LABEL}}
+      </button>
+      <button class="tab-btn" role="tab" data-target="perspective-2" aria-controls="perspective-2" aria-selected="false">
+        <span class="tab-index">2</span>{{TAB_2_LABEL}}
+      </button>
+      <button class="tab-btn" role="tab" data-target="perspective-3" aria-controls="perspective-3" aria-selected="false">
+        <span class="tab-index">3</span>{{TAB_3_LABEL}}
+      </button>
+    </nav>
+
+    <!-- ============================================================
+         PANEL 1
+         ============================================================ -->
+    <div class="panel" id="perspective-1" role="tabpanel" aria-hidden="true">
+      <section>
+        <h2>{{P1_SECTION_HEADING}}</h2>
+        <p class="lead">{{P1_LEAD}}</p>
+        <p>{{P1_BODY}}</p>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         PANEL 2
+         ============================================================ -->
+    <div class="panel" id="perspective-2" role="tabpanel" aria-hidden="true">
+      <section>
+        <h2>{{P2_SECTION_HEADING}}</h2>
+        <p class="lead">{{P2_LEAD}}</p>
+        <p>{{P2_BODY}}</p>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         PANEL 3
+         ============================================================ -->
+    <div class="panel" id="perspective-3" role="tabpanel" aria-hidden="true">
+      <section>
+        <h2>{{P3_SECTION_HEADING}}</h2>
+        <p class="lead">{{P3_LEAD}}</p>
+        <p>{{P3_BODY}}</p>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         コンポーネントギャラリー（成果物では削除する）
+         必要なスニペットを上のパネル内 section にコピーして使う。
+         ============================================================ -->
+    <div class="panel" id="gallery" role="tabpanel" aria-hidden="true">
+
+      <section>
+        <h2>コールアウト（callout）</h2>
+        <div class="callout">
+          <strong>📍 通常</strong>：ブランド色のコールアウト。補足・確定事項に。
+        </div>
+        <div class="callout callout-info">
+          <strong>ℹ️ 情報</strong>：背景・経緯の補足に。
+        </div>
+        <div class="callout callout-success">
+          <strong>✅ 成功</strong>：完了条件・推奨事項に。
+        </div>
+        <div class="callout callout-warn">
+          <strong>⚠️ 警告</strong>：注意点・落とし穴に。
+        </div>
+      </section>
+
+      <section>
+        <h2>引用ブロック（quote）— 出典明示に必須</h2>
+        <blockquote class="quote">
+          引用本文をここに書く。原典の表現を尊重する。
+          <span class="quote-source">出典: 要件定義書 §X.Y / 議論ログ_XXX TurnN</span>
+        </blockquote>
+      </section>
+
+      <section>
+        <h2>リスト・コード</h2>
+        <h3>箇条書き</h3>
+        <ul>
+          <li>項目（インラインは <code>code</code> で）</li>
+          <li>項目</li>
+        </ul>
+        <h3>コードブロック</h3>
+<pre><code>// 言語名はコメントで明示
+const example = streamText({ model });</code></pre>
+      </section>
+
+      <section>
+        <h2>テーブル</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>列1</th><th>列2</th><th>列3</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>値</td><td>値</td><td>値</td></tr>
+              <tr><td>値</td><td>値</td><td>値</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>アコーディオン（深堀り・FAQに）</h2>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">
+            <span>見出し（問い・トピック）</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="accordion-body">
+            <p>展開して表示する本文。長い補足や選定理由をここに収める。</p>
+            <blockquote class="quote">
+              根拠の引用。
+              <span class="quote-source">出典: ...</span>
+            </blockquote>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>図解（inline SVG）— 外部依存ゼロのため SVG は HTML 内に直書き</h2>
+        <div class="diagram" role="img" aria-label="図の説明（スクリーンリーダー用）">
+          <svg viewBox="0 0 360 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#5b21b6"/>
+              </marker>
+            </defs>
+            <rect x="20" y="30" width="120" height="60" rx="10" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5"/>
+            <text x="80" y="65" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#4c1d95" text-anchor="middle">入力</text>
+            <line x1="140" y1="60" x2="218" y2="60" stroke="#5b21b6" stroke-width="2" marker-end="url(#arr)"/>
+            <rect x="220" y="30" width="120" height="60" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+            <text x="280" y="65" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#14532d" text-anchor="middle">出力</text>
+          </svg>
+          <p class="diagram-caption">図X-Y: 図のキャプション</p>
+        </div>
+      </section>
+
+    </div>
+
+    <footer class="page-footer">
+      <a href="{{FOOTER_LINK_1_HREF}}">{{FOOTER_LINK_1_LABEL}}</a>
+      <a href="{{FOOTER_LINK_2_HREF}}">{{FOOTER_LINK_2_LABEL}}</a>
+      <span>{{FOOTER_NOTE}}</span>
+    </footer>
+  </div>
+
+  <script src="scripts-interactive.js"></script>
+</body>
+</html>

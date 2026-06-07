@@ -2,11 +2,11 @@
 doc_id: task.docs.html-doc-builder-skill
 title: TSK-DOCS-003 HTML作成フローのスキル化
 doc_type: task
-status: planned
+status: review
 author: えんまさ
 created_at: 2026-05-27
 github_issue: "#64"
-branch: "TBD — /start-task で作成"
+branch: "feature/64-html-doc-builder-skill"
 related_requirements: ""
 related_impl_plan: ""
 depends_on: TSK-DOCS-002
@@ -14,11 +14,11 @@ depends_on: TSK-DOCS-002
 
 # TSK-DOCS-003：HTML作成フローのスキル化
 
-> **ステータス**: planned
+> **ステータス**: review
 > **担当**: えんまさ
 > **Issue**: [#64](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/64)
 > **依存**: [TSK-DOCS-002](TSK-DOCS-002-html-docs-for-members.md) 完了後着手
-> **ブランチ**: TBD — `/start-task` で作成
+> **ブランチ**: `feature/64-html-doc-builder-skill`
 
 ---
 
@@ -63,13 +63,13 @@ TSK-DOCS-002 のHTML作成プロセスを `.claude/skills/interactive-html-doc-b
 
 ## 完了定義
 
-- [ ] `pnpm typecheck` 通過（コード変更なしのため自動的に通過）
-- [ ] `pnpm lint` 通過
-- [ ] `.claude/skills/interactive-html-doc-builder/SKILL.md` が存在し、trigger words が明文化されている
-- [ ] `assets/` 配下に基底テンプレート（HTML/CSS/JS）が配置されている
-- [ ] スキルから試作HTMLが生成できることを確認（テスト実行ログをPRに添付）
-- [ ] Gate 1（ヒラメ）: 不要
-- [ ] Gate 2（えんまさ）: 不要（スキル機械化・意味的判断なし）
+- [x] `pnpm typecheck` 通過（エラー0）
+- [x] `pnpm lint` 通過（エラー0／既存 app/page.tsx の警告2件のみ）
+- [x] `.claude/skills/interactive-html-doc-builder/SKILL.md` が存在し、trigger words が明文化されている
+- [x] `assets/` 配下に基底テンプレート（HTML/CSS/JS）が配置されている
+- [x] スキルから試作HTMLが生成できることを確認（`docs/output/help/sandbox/test.html` を Playwright でタブ/アコーディオン/SVG動作検証）
+- [x] Gate 1（ヒラメ）: 不要
+- [x] Gate 2（えんまさ）: 不要（スキル機械化・意味的判断なし）
 
 ---
 
@@ -78,3 +78,4 @@ TSK-DOCS-002 のHTML作成プロセスを `.claude/skills/interactive-html-doc-b
 | 日付 | 更新者 | 内容 |
 |------|--------|------|
 | 2026-05-27 | えんまさ | 初版作成（task-issue-generator スキルにより自動生成） |
+| 2026-06-07 | えんまさ | スキル `interactive-html-doc-builder` を実装（SKILL.md + assets 3点）。TSK-DOCS-002 の CSS/JS を基底に移植、html-template とコンポーネントギャラリーを追加。試作 `sandbox/test.html` を Playwright で動作確認。status: planned → review |
