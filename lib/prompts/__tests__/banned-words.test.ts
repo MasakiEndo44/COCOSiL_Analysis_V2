@@ -21,6 +21,7 @@ import {
   buildIntegratedReportUserPrompt,
   type IntegratedReportInput,
 } from '@/lib/prompts/integrated-report'
+import { buildProfileCore } from '@/lib/diagnostics/integration'
 
 describe('lib/prompts: 禁止語彙の不混入（Constitution as Code）', () => {
   test('onboarding: WELCOME_SYSTEM_PROMPT に禁止語彙が含まれない', () => {
@@ -115,9 +116,14 @@ describe('lib/prompts: chat-phase2 — 禁止語彙チェック（F4 Phase 2 共
   })
 })
 
-describe('lib/prompts: integrated-report — 禁止語彙チェック（F3.1 統合レポート）', () => {
+describe('lib/prompts: integrated-report — Phase 2 ProfileCore 翻訳層', () => {
+  // 実際の決定論スコア核を注入してプロンプトを検証する（モックでなく本物の契約で確認）。
+  const coreA = buildProfileCore({ birthDate: new Date(1995, 0, 15), mbti: 'INFJ' }, 'T')
+  const coreB = buildProfileCore({ birthDate: new Date(1990, 6, 7), mbti: 'INTJ' }, 'A')
+
   const withDescription: IntegratedReportInput = {
     displayName: 'みさき',
+    profileCore: coreA,
     zodiac: { label: '蟹座', description: '身近な人の感情を細やかに受け取る守りの温かさ' },
     animal: { label: '母性豊かな子守熊', description: '包容力とマイペースな回復力' },
     sixStar: { label: '土星人＋', description: '時間をかけて積み上げる堅実さ' },
@@ -125,6 +131,7 @@ describe('lib/prompts: integrated-report — 禁止語彙チェック（F3.1 統
   }
   const labelOnly: IntegratedReportInput = {
     displayName: null,
+    profileCore: coreB,
     zodiac: { label: '水瓶座' },
     animal: { label: 'クリエイティブな狼' },
     sixStar: { label: '木星人−' },
@@ -154,18 +161,57 @@ describe('lib/prompts: integrated-report — 禁止語彙チェック（F3.1 統
     expect(prompt).toContain('地図')
   })
 
-  test('buildIntegratedReportUserPrompt: 説明文ありでも禁止語彙が含まれない', () => {
-    const built = buildIntegratedReportUserPrompt(withDescription)
-    expect(findBannedWords(built)).toEqual([])
-    expect(built).toContain('呼び名: みさき')
-    expect(built).toContain('母性豊かな子守熊 — 包容力')
+  test('翻訳者フレーミング: 再計算・発明を禁じる指示が明記される', () => {
+    const prompt = resolveIntegratedReportSystemPrompt(true)
+    expect(prompt).toContain('翻訳')
+    expect(prompt).toContain('計算し直さない')
+    expect(prompt).toContain('発明しない')
   })
 
-  test('buildIntegratedReportUserPrompt: 説明文なし（フォールバック）はラベルのみ・呼び名「あなた」', () => {
+  test('出自の正直さ: 設計上の理論分布を明示し詐称を禁じる指示がある', () => {
+    const prompt = resolveIntegratedReportSystemPrompt(true)
+    expect(prompt).toContain('設計上の理論分布')
+    expect(prompt).toContain('詐称')
+  })
+
+  test('catchphrase と weakness は LLM 出力に含めない（決定論で確定するため）', () => {
+    expect(resolveIntegratedReportSystemPrompt(true)).toContain('catchphrase と weakness は出力しない')
+  })
+
+  test('言葉の解像度: 分析用語の日常語化と体言止め・冗長排除の指示がある（Gate 2）', () => {
+    const prompt = resolveIntegratedReportSystemPrompt(true)
+    expect(prompt).toContain('体の動き方') // 日常語マップを本文に明示
+    expect(prompt).toContain('本文に書かない') // 分析用語をそのまま使わせない
+    expect(prompt).toContain('体言止め') // strengths / johari を体言止めに
+    expect(prompt).toContain('繰り返さない') // 冗長な前置きの排除
+  })
+
+  test('buildIntegratedReportUserPrompt: ProfileCore 注入でも禁止語彙が含まれない', () => {
+    expect(findBannedWords(buildIntegratedReportUserPrompt(withDescription))).toEqual([])
+    expect(findBannedWords(buildIntegratedReportUserPrompt(labelOnly))).toEqual([])
+  })
+
+  test('buildIntegratedReportUserPrompt: 確定スコア核（キャラ像・強み・癖）を列挙注入する', () => {
+    const built = buildIntegratedReportUserPrompt(withDescription)
+    expect(built).toContain('呼び名: みさき')
+    expect(built).toContain('母性豊かな子守熊 — 包容力')
+    expect(built).toContain(coreA.characterLabel)
+    expect(built).toContain(coreA.strengths[0])
+    expect(built).toContain(coreA.weakness.trait) // 癖は参考情報として注入（exit は固定表示なので渡さない）
+    expect(built).toContain('設計上の理論分布')
+  })
+
+  test('buildIntegratedReportUserPrompt: 軸は日常語で注入し分析用語を渡さない（Gate 2）', () => {
+    const built = buildIntegratedReportUserPrompt(withDescription)
+    expect(built).not.toContain('認知スタイル')
+    expect(built).not.toContain('対人モード')
+    expect(built).toContain('人との関わり方') // PLAIN_AXIS の日常語
+  })
+
+  test('buildIntegratedReportUserPrompt: 説明文なしはラベルのみ・呼び名「あなた」', () => {
     const built = buildIntegratedReportUserPrompt(labelOnly)
-    expect(findBannedWords(built)).toEqual([])
     expect(built).toContain('呼び名: あなた')
     expect(built).toContain('動物タイプ（60type）: クリエイティブな狼')
-    expect(built).not.toContain(' — ')
+    expect(built).not.toContain('クリエイティブな狼 — ')
   })
 })

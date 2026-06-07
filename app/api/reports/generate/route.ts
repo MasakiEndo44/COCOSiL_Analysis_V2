@@ -3,7 +3,7 @@ import { GenerateReportBodySchema } from '@/lib/reports/schemas'
 import { generateReportContent } from '@/lib/reports/llm'
 import { uploadReportImage, saveReportRecord } from '@/lib/reports/storage'
 import { moderateDisplayName } from '@/lib/constitution/name-moderation'
-import { harvest } from '@/lib/diagnostics/integration'
+import { buildProfileCore } from '@/lib/diagnostics/integration'
 import { buildOgImageResponse } from '@/lib/reports/og-builder'
 import type { GenerateReportResponse, ReportContent } from '@/lib/reports/schemas'
 
@@ -31,6 +31,7 @@ export async function POST(request: Request): Promise<NextResponse<GenerateRepor
     animalCharacter,
     zodiacSign,
     sixStar,
+    identity,
     displayName: rawDisplayName,
     userId,
     phase,
@@ -38,17 +39,24 @@ export async function POST(request: Request): Promise<NextResponse<GenerateRepor
 
   const { sanitized: displayName } = moderateDisplayName(rawDisplayName ?? null)
 
-  let harvestMeta: string | undefined
+  // Score Once, Narrate Freely: 決定論スコア核をここで一度だけ確定する（identity 未指定は中立 T）。
+  let profileCore
   try {
     const [yearStr, monthStr, dayStr] = birthDate.split('-')
-    const harvestResult = harvest({
-      birthDate: new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)),
-      mbti: mbtiType,
-      phase,
-    })
-    harvestMeta = harvestResult.meta
+    profileCore = buildProfileCore(
+      {
+        birthDate: new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr)),
+        mbti: mbtiType,
+        phase,
+      },
+      identity ?? 'T',
+    )
   } catch (err) {
-    console.error('harvest() error (non-fatal):', err)
+    console.error('buildProfileCore() error:', err)
+    return NextResponse.json(
+      { success: false, error: 'レポートの基礎データ生成に失敗しました。もう一度試してみてください。' },
+      { status: 500 },
+    )
   }
 
   let content: ReportContent | undefined
@@ -56,14 +64,17 @@ export async function POST(request: Request): Promise<NextResponse<GenerateRepor
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      content = await generateReportContent({
-        displayName,
-        zodiacSign,
-        animalCharacter,
-        sixStar,
-        mbtiType,
-        harvestMeta,
-      })
+      content = await generateReportContent(
+        {
+          displayName,
+          profileCore,
+          zodiacSign,
+          animalCharacter,
+          sixStar,
+          mbtiType,
+        },
+        attempt,
+      )
       break
     } catch (err) {
       llmError = err
