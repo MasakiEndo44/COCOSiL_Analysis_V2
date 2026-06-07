@@ -2,21 +2,21 @@
 doc_id: task.f3.report-api
 title: TSK-API-002 F3 Vercel OGレポート生成API
 doc_type: task
-status: planned
+status: review
 author: ヒラメ
 created_at: 2026-05-07
 github_issue: "#35"
-branch: TBD
+branch: feature/36-f3-profilecore-report-wiring
 related_requirements: docs/output/requirements/cocosil_v2_detailed_requirements_specification.md#43-統合レポートf3-v2の核心
 related_impl_plan: ""
 ---
 
 # TSK-API-002：F3 Vercel OGレポート生成API
 
-> **ステータス**: planned
+> **ステータス**: review
 > **担当**: ヒラメ
 > **Issue**: [#35](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/35)
-> **ブランチ**: `TBD — /start-task で作成`
+> **ブランチ**: `feature/36-f3-profilecore-report-wiring`
 
 ---
 

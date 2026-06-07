@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import posthog from "posthog-js";
 import type { MbtiResult } from "../types";
+import { SESSION_KEYS } from "@/lib/sessionKeys";
 import { MBTI_TYPE_DESCRIPTIONS, MBTI_AXES_DATA } from "@/app/_data/mbti-descriptions";
 
 interface Props {
@@ -47,6 +48,14 @@ export function MbtiResultView({ result }: Props) {
   const handleRetry = () => {
     posthog.capture("mbti_quiz_retried", { mbti_type: result.mbtiType });
     window.location.reload();
+  };
+
+  // クイズ経路でも統合レポート（result）が MBTI 型と A/T 軸を読めるようセッションに保存する
+  // （直接選択経路 select/page.tsx と対称化）。
+  const goToReport = () => {
+    sessionStorage.setItem(SESSION_KEYS.MBTI_TYPE, result.mbtiType);
+    sessionStorage.setItem(SESSION_KEYS.MBTI_IDENTITY, result.identity);
+    router.push("/diagnosis/reassurance");
   };
 
   function toggleAxis(key: string) {
@@ -487,7 +496,7 @@ export function MbtiResultView({ result }: Props) {
           {/* CTAボタン */}
           <button
             type="button"
-            onClick={() => router.push("/diagnosis/reassurance")}
+            onClick={goToReport}
             className="btn-press"
             style={{
               width: "100%", height: 56, borderRadius: 999,

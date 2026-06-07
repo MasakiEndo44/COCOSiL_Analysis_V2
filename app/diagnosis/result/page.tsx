@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import { SESSION_KEYS } from "@/lib/sessionKeys";
 import { KnowMarker } from "@/components/report/KnowMarker";
 import { SatisfactionSurvey } from "@/components/report/SatisfactionSurvey";
-import { OBSERVATION_AXES } from "@/lib/constitution/observation-axes";
+import {
+  OBSERVATION_AXES,
+  type ObservationAxisId,
+} from "@/lib/constitution/observation-axes";
 import { gradientBtnStyle } from "@/lib/ui";
 import type {
   GenerateReportResponse,
   ReportContent,
-  AxisManifestation,
 } from "@/lib/reports/schemas";
 
 // 5観察軸のモバイル短縮ラベル（テーブル左カラムの折り返し崩壊を防ぐ）
-const AXIS_SHORT_LABEL: Record<AxisManifestation["axisKey"], string> = {
+const AXIS_SHORT_LABEL: Record<ObservationAxisId, string> = {
   embodied_pattern: "からだ",
   emotional_response: "感じ方",
   cognitive_style: "考え方",
@@ -106,6 +108,13 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
+const cardStyle: React.CSSProperties = {
+  background: "#fff",
+  border: "1.5px solid #ede9f8",
+  borderRadius: 16,
+  padding: "16px 18px",
+};
+
 export default function ResultPage() {
   const router = useRouter();
   const [state, setState] = useState<ReportState | null>(null);
@@ -134,6 +143,10 @@ export default function ResultPage() {
       return;
     }
 
+    // MBTI A/T 軸（未設定時は中立 T）。ProfileCore の入力一意化に使う。
+    const identityRaw = sessionStorage.getItem(SESSION_KEYS.MBTI_IDENTITY);
+    const identity = identityRaw === "A" ? "A" : "T";
+
     fetch("/api/reports/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -144,6 +157,7 @@ export default function ResultPage() {
         animalType: autoCalc.animalType,
         zodiacSign: autoCalc.zodiacSign,
         sixStar: autoCalc.sixStar,
+        identity,
       }),
     })
       .then((r) => r.json())
@@ -201,16 +215,10 @@ export default function ResultPage() {
     text: light.reading,
   }));
 
-  const axisRows = content.integration.map((axis) => ({
-    key: axis.axisKey,
-    label: AXIS_SHORT_LABEL[axis.axisKey] ?? OBSERVATION_AXES[axis.axisKey].label_ja,
-    text: axis.manifestation,
-  }));
-
   return (
     <div className="bg-aurora flex flex-col min-h-dvh" style={{ color: "#1e1a3c" }}>
       <main className="content-col flex-1 flex flex-col px-5 pt-10 pb-6 gap-7">
-        {/* キャッチフレーズ */}
+        {/* キャッチフレーズ（命名・決定論） */}
         {content.catchphrase && (
           <div style={{ textAlign: "center" }}>
             <span
@@ -229,19 +237,65 @@ export default function ResultPage() {
           </div>
         )}
 
-        {/* 4つの視点（4体系テーブル） */}
+        {/* 共感の素材: 4つの視点（4体系テーブル） */}
         <section>
           <SectionHeading>4つの視点</SectionHeading>
           <RowTable rows={lightRows} />
         </section>
 
-        {/* 統合力（5観察軸テーブル） */}
+        {/* 安心①: あなたの強み（強み先） */}
+        {content.strengths.length > 0 && (
+          <section>
+            <SectionHeading>あなたの強み</SectionHeading>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {content.strengths.map((s, i) => (
+                <div key={i} style={cardStyle}>
+                  <p
+                    style={{
+                      fontSize: 14.5,
+                      fontWeight: 800,
+                      color: "#7c5cfc",
+                      margin: "0 0 6px",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {s.label}
+                  </p>
+                  <p style={{ fontSize: 14, lineHeight: 1.75, color: "#1e1a3c", margin: 0 }}>
+                    {s.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 安心②: 気をつけたい癖（弱み後置・出口付き） */}
         <section>
-          <SectionHeading>統合力</SectionHeading>
-          <RowTable rows={axisRows} />
+          <SectionHeading>気をつけたい癖</SectionHeading>
+          <div style={cardStyle}>
+            <p style={{ fontSize: 14.5, fontWeight: 800, color: "#1e1a3c", margin: "0 0 12px", lineHeight: 1.6 }}>
+              {content.weakness.trait}
+            </p>
+            <div
+              style={{
+                background: "rgba(124,92,252,0.06)",
+                border: "1px solid rgba(124,92,252,0.18)",
+                borderRadius: 12,
+                padding: "12px 14px",
+              }}
+            >
+              <p style={{ fontSize: 11.5, fontWeight: 700, color: "#7c5cfc", margin: "0 0 4px", letterSpacing: "0.04em" }}>
+                ちょっとした出口
+              </p>
+              <p style={{ fontSize: 13.5, lineHeight: 1.75, color: "#1e1a3c", margin: 0 }}>
+                {content.weakness.exit}
+              </p>
+            </div>
+          </div>
         </section>
 
-        {/* 統合像（識・文章・観の山場） */}
+        {/* 観の山場: 統合像（識・AC-1） */}
         <section>
           <SectionHeading>あなたという人</SectionHeading>
           <div
@@ -273,18 +327,47 @@ export default function ResultPage() {
           </div>
         </section>
 
-        {/* 大切な人との関係 */}
+        {/* 分析①: あなたが知らない強み（ジョハリ盲点） */}
+        {content.johari.length > 0 && (
+          <section>
+            <SectionHeading>あなたが知らない強み</SectionHeading>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {content.johari.map((j) => (
+                <div key={j.sourceAxis} style={cardStyle}>
+                  <p style={{ fontSize: 11.5, fontWeight: 700, color: "#7c5cfc", margin: "0 0 4px" }}>
+                    {OBSERVATION_AXES[j.sourceAxis].label_ja}
+                  </p>
+                  <p style={{ fontSize: 14, lineHeight: 1.75, color: "#1e1a3c", margin: 0 }}>
+                    {j.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 分析②: 傾向の位置（設計上の理論分布） */}
+        {content.distribution.length > 0 && (
+          <section>
+            <SectionHeading>傾向の位置</SectionHeading>
+            <RowTable
+              rows={content.distribution.map((d) => ({
+                key: d.axis,
+                label: AXIS_SHORT_LABEL[d.axis] ?? OBSERVATION_AXES[d.axis].label_ja,
+                text: d.comment,
+              }))}
+            />
+            <p style={{ fontSize: 11, color: "#a39fc0", margin: "8px 4px 0", lineHeight: 1.6 }}>
+              ※ COCOSiLの設計上の理論分布での位置です（一般の人口分布ではありません）。
+            </p>
+          </section>
+        )}
+
+        {/* 行動の入口: 大切な人との関係（AC-2） */}
         {content.relational_hint && (
           <section>
             <SectionHeading>大切な人との関係</SectionHeading>
-            <div
-              style={{
-                background: "#fff",
-                border: "1.5px solid #ede9f8",
-                borderRadius: 16,
-                padding: "20px 20px 16px",
-              }}
-            >
+            <div style={cardStyle}>
               <p
                 style={{
                   fontSize: 15,
@@ -307,7 +390,7 @@ export default function ResultPage() {
           </section>
         )}
 
-        {/* おわりに（背景に溶け込むベタ打ち） */}
+        {/* 行動: おわりに（背景に溶け込むベタ打ち） */}
         {content.closing && (
           <p
             style={{

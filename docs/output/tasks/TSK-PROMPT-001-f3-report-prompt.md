@@ -2,21 +2,21 @@
 doc_id: task.f3.report-prompt
 title: TSK-PROMPT-001 F3 統合レポートプロンプト
 doc_type: task
-status: in-progress
+status: review
 author: えんまさ
 created_at: 2026-05-07
 github_issue: "#36"
-branch: feature/f3-integrated-report-prompt
+branch: feature/36-f3-profilecore-report-wiring
 related_requirements: docs/output/requirements/cocosil_v2_detailed_requirements_specification.md#43-統合レポートf3-v2の核心
 related_impl_plan: ""
 ---
 
 # TSK-PROMPT-001：F3 統合レポートプロンプト
 
-> **ステータス**: in-progress
+> **ステータス**: review
 > **担当**: えんまさ
 > **Issue**: [#36](https://github.com/COCOSiL-inc/COCOSiL_Analysis_V2/issues/36)
-> **ブランチ**: `feature/f3-integrated-report-prompt`
+> **ブランチ**: `feature/36-f3-profilecore-report-wiring`
 
 ---
 
