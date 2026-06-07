@@ -50,6 +50,14 @@ docs/output/help/
 
 図表（SVG）は HTML 内に inline で埋め込んでおり、外部 `assets/` ディレクトリは作成していない。これにより `index.html` 単体で完結する。
 
+`sandbox/` はスキル動作確認用の試作置き場（本番ドキュメントではない）。
+
+## 同種ドキュメントの追加・再生成
+
+本ドキュメント群の作成フロー（情報源抽出 → セクション構成 → インタラクティブHTML生成）は
+`interactive-html-doc-builder` スキル（`.claude/skills/interactive-html-doc-builder/`）として再利用可能。
+新しい説明HTMLを作るときは同スキルを起動する（基底テンプレート・共通CSS/JSは `assets/` に同梱）。
+
 ## 関連ドキュメント
 
 - 要件定義書: [cocosil_v2_detailed_requirements_specification.md](../requirements/cocosil_v2_detailed_requirements_specification.md)

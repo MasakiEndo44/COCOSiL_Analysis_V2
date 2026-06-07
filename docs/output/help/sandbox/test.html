@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="interactive-html-doc-builder スキルの動作確認用 試作ドキュメント（TSK-DOCS-003）">
+  <title>interactive-html-doc-builder — 動作確認ページ</title>
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <p><span class="badge">For 開発メンバー</span><span class="badge">test / 2026-06-07</span></p>
+      <h1>interactive-html-doc-builder — 動作確認</h1>
+      <p class="subtitle">
+        TSK-DOCS-003 のスキル化テスト。基底テンプレートから2観点の小さなドキュメントを生成し、
+        タブ・アコーディオン・図表が動作するかを確認する。
+      </p>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="2観点切替">
+      <button class="tab-btn" role="tab" data-target="perspective-1" aria-controls="perspective-1" aria-selected="false">
+        <span class="tab-index">1</span>スキルの目的
+      </button>
+      <button class="tab-btn" role="tab" data-target="perspective-2" aria-controls="perspective-2" aria-selected="false">
+        <span class="tab-index">2</span>使い方とコンポーネント
+      </button>
+    </nav>
+
+    <!-- ============================================================
+         PANEL 1 : スキルの目的
+         ============================================================ -->
+    <div class="panel" id="perspective-1" role="tabpanel" aria-hidden="true">
+      <section>
+        <h2>1.1 何をするスキルか</h2>
+        <p class="lead">
+          情報源（要件定義書・議論ログ・既存ナレッジ）から、外部依存ゼロで単体動作する
+          インタラクティブHTML説明ドキュメントを生成する。
+        </p>
+        <div class="callout callout-info">
+          <strong>ℹ️ 位置づけ</strong>：TSK-DOCS-002 で作った <code>docs/output/help/index.html</code> の
+          作成フローを再現可能にしたもの。同じ見た目・挙動を1コマンドで再現する。
+        </div>
+        <blockquote class="quote">
+          TSK-DOCS-002 のHTML作成プロセスを <code>.claude/skills/interactive-html-doc-builder/</code> として再利用可能にする。
+          <span class="quote-source">出典: docs/output/tasks/TSK-DOCS-003-html-doc-builder-skill.md §概要</span>
+        </blockquote>
+      </section>
+
+      <section>
+        <h2>1.2 必須性質</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>性質</th><th>意味</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>外部依存ゼロ</td><td>CDN・npm・サーバー不要。<code>open</code> だけで動く</td></tr>
+              <tr><td>単体配布可能</td><td>HTML + CSS + JS の3点セット（SVG図は inline）</td></tr>
+              <tr><td>引用主義</td><td>本文はすべて出典付き。新規の意味的判断を足さない</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================================================
+         PANEL 2 : 使い方とコンポーネント
+         ============================================================ -->
+    <div class="panel" id="perspective-2" role="tabpanel" aria-hidden="true">
+      <section>
+        <h2>2.1 生成フロー</h2>
+        <ol>
+          <li>情報源の抽出（Read Before Write）</li>
+          <li>セクション構成の設計（観点 → セクション → 小見出し）</li>
+          <li>基底テンプレート <code>assets/html-template.html</code> の展開</li>
+          <li>コンポーネント実装（callout / quote / accordion / table / 図解）</li>
+          <li>ブラウザで動作確認</li>
+        </ol>
+        <div class="callout callout-success">
+          <strong>✅ 確認</strong>：このページが正しく表示・操作できれば、基底CSS/JSの移植は成功している。
+        </div>
+      </section>
+
+      <section>
+        <h2>2.2 アコーディオン（深堀り）</h2>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false">
+            <span>なぜ Tailwind を使わないのか</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="accordion-body">
+            <p>
+              外部依存ゼロ・単体動作という要件のため。ビルド工程なしで <code>open</code> だけで動く必要がある。
+              色は <code>styles-base.css</code> の <code>:root</code> 変数に集約している。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>2.3 図解（inline SVG）</h2>
+        <div class="diagram" role="img" aria-label="生成フローの3段階">
+          <svg viewBox="0 0 540 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#5b21b6"/>
+              </marker>
+            </defs>
+            <rect x="10" y="25" width="140" height="50" rx="10" fill="#ede9fe" stroke="#5b21b6" stroke-width="1.5"/>
+            <text x="80" y="55" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#4c1d95" text-anchor="middle">情報源抽出</text>
+            <line x1="150" y1="50" x2="198" y2="50" stroke="#5b21b6" stroke-width="2" marker-end="url(#arr)"/>
+            <rect x="200" y="25" width="140" height="50" rx="10" fill="#dbeafe" stroke="#0284c7" stroke-width="1.5"/>
+            <text x="270" y="55" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#075985" text-anchor="middle">構成設計</text>
+            <line x1="340" y1="50" x2="388" y2="50" stroke="#5b21b6" stroke-width="2" marker-end="url(#arr)"/>
+            <rect x="390" y="25" width="140" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+            <text x="460" y="55" font-family="-apple-system, sans-serif" font-size="13" font-weight="600" fill="#14532d" text-anchor="middle">HTML生成</text>
+          </svg>
+          <p class="diagram-caption">図2-1: 生成フローの3段階</p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      <a href="../README.md">help/README.md</a>
+      <a href="../../tasks/TSK-DOCS-003-html-doc-builder-skill.md">TSK-DOCS-003</a>
+      <span>interactive-html-doc-builder 動作確認用（試作）</span>
+    </footer>
+  </div>
+
+  <script src="../scripts.js"></script>
+</body>
+</html>
