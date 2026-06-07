@@ -87,6 +87,7 @@ export async function POST(request: Request) {
     const supabase = getSupabaseClient();
     const insertRow: TablesInsert<"mbti_results"> = {
       mbti_type: result.mbtiType,
+      identity: result.identity,
       scores: result.scores as unknown as Json,
       pci: result.pci as unknown as Json,
       answers: (body.answers as unknown as Json) ?? null,
