@@ -24,6 +24,7 @@ const AXIS_SHORT_LABEL: Record<AxisManifestation["axisKey"], string> = {
 
 interface ReportState {
   reportId?: string;
+  imageBase64?: string;
   content?: ReportContent;
 }
 
@@ -152,7 +153,7 @@ export default function ResultPage() {
           setError(data.error ?? "レポートの生成に失敗しました。もう一度試してみてください。");
           return;
         }
-        setState({ reportId: data.reportId, content: data.content });
+        setState({ reportId: data.reportId, imageBase64: data.imageBase64, content: data.content });
       })
       .catch(() => {
         setError("ネットワークエラーが発生しました。もう一度試してみてください。");
@@ -193,7 +194,7 @@ export default function ResultPage() {
 
   if (!state?.content) return null;
 
-  const { reportId, content } = state;
+  const { reportId, imageBase64, content } = state;
 
   const lightRows = content.four_lights.map((light) => ({
     key: light.system,
@@ -226,6 +227,18 @@ export default function ResultPage() {
             >
               {content.catchphrase}
             </span>
+          </div>
+        )}
+
+        {/* OGカード画像 */}
+        {imageBase64 && (
+          <div style={{ textAlign: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`data:image/png;base64,${imageBase64}`}
+              alt="あなたのパーソナリティカード"
+              style={{ display: "block", width: "100%", maxWidth: 480, margin: "0 auto", borderRadius: 16, boxShadow: "0 4px 24px rgba(124,92,252,0.15)" }}
+            />
           </div>
         )}
 

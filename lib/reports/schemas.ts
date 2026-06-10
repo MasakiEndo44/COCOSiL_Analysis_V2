@@ -20,6 +20,7 @@ export interface GenerateReportResponse {
   success: boolean
   reportId?: string
   reportUrl?: string
+  imageBase64?: string
   content?: ReportContent
   fallback?: boolean
   error?: string
