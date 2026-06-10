@@ -117,10 +117,13 @@ export async function POST(request: Request): Promise<NextResponse<GenerateRepor
     }
   }
 
+  const imageBase64 = pngBuffer ? Buffer.from(pngBuffer).toString('base64') : undefined
+
   const responseBody: GenerateReportResponse = {
     success: true,
     reportId,
     reportUrl,
+    imageBase64,
     content,
     fallback: usedFallback,
   }
